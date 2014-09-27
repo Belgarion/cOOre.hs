@@ -1,0 +1,79 @@
+° Syntax:
+° stöd för matematiska parenteser
+
+GÖR <stmts> KLART
+OM <expr> <then stmts> (ANNARS <else stmts>) KLART
+FÖR VARJE <lista> SOM <variabelnamn> <stmts> KLART
+FÖR <expr> <stmts> KLART
+
+BEGÄR <resurser> KLART	° claim
+
+<FUNKTION | typ> <funktionsnamn> (PARAMETRAR <params>) GÖR <stmts> KLART
+° FUNKTION är void
+° params delas upp med mellanslag
+
+RETURNERA <expr>		° returnerar värde
+
+
+° kommentar
+°*
+multiline kommentar
+aoeu
+*°
+
+? "sträng"				° skriv till stdout
+! "sträng"				° skriv till stderr
+> <variabelnamn>		° inmatning från stdin
+
+UT "sträng"				° alias till ?
+ERRORUT "STRÄNG"		° alias till !
+IN <variabel>			° alias >
+
+
+° Datatyper:
+SANN = allt som inte är 0
+FALSKT = 0
+
+HEL						° heltal
+OFLYT					° heltal
+
+FLYT					° flyttal
+OHEL					° flyttal
+
+KARA					° karaktär (är egentligen alias för 8bit-HEL)
+STRÄNG					° sträng (LISTA KARA *)
+
+BOOLSK					° bool
+
+LISTA <typ> <längd>		° lista
+
+
+° Klasser
+
+STRUKTUR <namn> INNEHÅLLER
+° klassinnehåll
+SLUT
+
+° Boolsk operation
+OCH
+ELLER
+INTE
+
+° Bitwise
+SAMMA					° AND
+ALTERNATIVT				° OR
+INVERTERA				° NOT
+XALTERNATIVT			° XOR
+SKIFTA HÖGER <heltal>	° >> heltal
+SKIFTA VÄNSTER <heltal>	° << heltal
+
+° Jämförelser
+STÖRRE ÄN
+MINDRE ÄN
+LIKA MED
+
+
+° variabel definition
+HEL A					° definerar A som heltal
+HEL A = 77				° definerar A som heltal och sätter värde 77
+A = 77					° sätter A till 77 (fungerar även som definition med automatisk typigenkänning)
