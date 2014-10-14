@@ -6,10 +6,13 @@ import Text.Parsec.String (Parser)
 import qualified Text.Parsec.Expr as Ex
 import qualified Text.Parsec.Token as Tok
 
+-- inflix fmap
+import Control.Applicative ((<$>))
 import Lexer
 import Syntax
 
-binary s f assoc = Ex.Infix (reservedOp s >> return (BinOp f)) assoc
+binop = Ex.Infix (BinaryOp <$> op) Ex.AssocLeft
+unop = Ex.Prefix (UnaryOp <$> op)
 
 table = [[binary "*" Times Ex.AssocLeft,
           binary "/" Divide Ex.AssocLeft]
