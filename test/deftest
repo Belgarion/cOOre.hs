@@ -1,0 +1,4 @@
+def foo(x y) kalle;
+
+def foo2(x y) 
+	x+foo2(y, 4.0);
