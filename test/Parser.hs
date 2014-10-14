@@ -39,7 +39,7 @@ function = do
   reserved "def"
   name <- identifier
   args <- parens $ many variable
-  body <- expr
+  body <- many expr
   return $ Function name args body
 
 extern :: Parser Expr

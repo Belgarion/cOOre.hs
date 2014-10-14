@@ -1,4 +1,6 @@
-def foo(x y) kalle;
+def foo(x y) 
+	kalle+1
+	kalle+1;
 
 def foo2(x y) 
 	x+foo2(y, 4.0);
