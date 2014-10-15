@@ -1,6 +1,7 @@
 def foo(x y) 
 	kalle+1
-	kalle+1;
+	kalle+1
+	kalle = 10+2;
 
 def foo2(x y) 
 	x+foo2(y, 4.0);

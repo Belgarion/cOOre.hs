@@ -1,1 +1,4 @@
 cOOre compiler in haskell
+inspiration taken from: 
+http://www.stephendiehl.com/llvm/
+https://github.com/sdiehl/kaleidoscope/

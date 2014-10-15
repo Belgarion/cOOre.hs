@@ -11,13 +11,24 @@ import Control.Applicative ((<$>))
 import Lexer
 import Syntax
 
-binop = Ex.Infix (BinaryOp <$> op) Ex.AssocLeft
-unop = Ex.Prefix (UnaryOp <$> op)
+--binop = Ex.Infix (BinaryOp <$> op) Ex.AssocLeft
+--unop = Ex.Prefix (UnaryOp <$> op)
 
-table = [[binary "*" Times Ex.AssocLeft,
-          binary "/" Divide Ex.AssocLeft]
-        ,[binary "+" Plus Ex.AssocLeft,
-          binary "-" Minus Ex.AssocLeft]]
+binary s assoc = Ex.Infix (reservedOp s >> return (BinaryOp s)) assoc
+
+op :: Parser String
+op = do
+  whitespace
+  o <- operator
+  whitespace
+  return o
+
+binops = [[binary "=" Ex.AssocLeft]
+         ,[binary "*" Ex.AssocLeft,
+           binary "/" Ex.AssocLeft]
+         ,[binary "+" Ex.AssocLeft,
+           binary "-" Ex.AssocLeft]
+         ,[binary "<" Ex.AssocLeft]]
 
 int :: Parser Expr
 int = do
@@ -30,7 +41,7 @@ floating = do
   return $ Float n
 
 expr :: Parser Expr
-expr = Ex.buildExpressionParser table factor
+expr = Ex.buildExpressionParser (binops) factor
 
 variable :: Parser Expr
 variable = do
