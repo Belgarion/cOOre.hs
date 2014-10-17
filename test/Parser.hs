@@ -48,7 +48,7 @@ exprnum :: Parser Expr
 exprnum = Ex.buildExpressionParser (binops) factor
 
 exprctlr :: Parser Expr
-exprctlr = _if
+exprctlr = _if <|> for
 
 variable :: Parser Expr
 variable = do
@@ -86,7 +86,7 @@ factor = try floating
       <|> variable
       <|> parens expr
 
-_if :: Parser Expr 
+_if :: Parser Expr
 _if = do
     reserved "om"
     cond <- expr
@@ -100,6 +100,16 @@ _else = do
     reserved "annars"
     ebod <- many expr
     return ebod
+
+for :: Parser Expr
+for = do
+    reserved "för"
+    before <- expr
+    cond <- expr
+    after <- expr
+    body <- many expr
+    reserved "klar"
+    return $ For before cond after body
 
 defn :: Parser Expr
 defn = try extern

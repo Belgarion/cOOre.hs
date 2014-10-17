@@ -27,5 +27,12 @@ struktur hej
 			a = 20
 			klar
 		klar
+
+        för a=5 5=5 a=6
+            kalle+1
+            kalle+2
+            kalle+3
+            kalle+4
+        klar
 	klar
 meep
