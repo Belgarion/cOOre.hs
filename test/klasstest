@@ -1,0 +1,15 @@
+struktur hej
+def foo(x y) 
+	kalle+1
+	kalle+1
+	kalle = 10+2
+klar
+
+def foo2(x y) 
+	x+foo2(y, 4.0)
+klar
+
+def foo3(x y)
+klar
+
+meep

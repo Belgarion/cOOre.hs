@@ -54,6 +54,7 @@ function = do
   name <- identifier
   args <- parens $ many variable
   body <- many expr
+  reserved "klar"
   return $ Function name args body
 
 extern :: Parser Expr
@@ -92,9 +93,16 @@ contents p = do
 
 toplevel :: Parser [Expr]
 toplevel = many $ do
-    def <- defn
-    reservedOp ";"
+    def <- klass
     return def
+
+klass :: Parser Expr
+klass = do
+    reserved "struktur"
+    name <- identifier
+    stmts <- many defn
+    reserved "meep"
+    return $ Klass name stmts
 
 parseExpr :: String -> Either ParseError Expr
 parseExpr s = parse (contents expr) "<stdin>" s

@@ -12,6 +12,7 @@ data Expr
   | UnaryDef Name [Name] Expr
   | BinaryOp Name Expr Expr
   | UnaryOp Name Expr
+  | Klass Name [Expr]
   deriving (Eq, Ord, Show)
 
 {-data Op
