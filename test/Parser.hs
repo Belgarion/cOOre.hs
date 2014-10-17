@@ -41,7 +41,14 @@ floating = do
   return $ Float n
 
 expr :: Parser Expr
-expr = Ex.buildExpressionParser (binops) factor
+expr = try exprnum
+    <|> exprctlr
+
+exprnum :: Parser Expr
+exprnum = Ex.buildExpressionParser (binops) factor
+
+exprctlr :: Parser Expr
+exprctlr = _if
 
 variable :: Parser Expr
 variable = do
@@ -78,6 +85,21 @@ factor = try floating
       <|> try call
       <|> variable
       <|> parens expr
+
+_if :: Parser Expr 
+_if = do
+    reserved "om"
+    cond <- expr
+    tbod <- many expr
+    ebod <- option [] _else
+    reserved "klar"
+    return $ If cond tbod ebod
+
+_else :: Parser [Expr]
+_else = do
+    reserved "annars"
+    ebod <- many expr
+    return ebod
 
 defn :: Parser Expr
 defn = try extern

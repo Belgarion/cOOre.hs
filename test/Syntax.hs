@@ -13,6 +13,7 @@ data Expr
   | BinaryOp Name Expr Expr
   | UnaryOp Name Expr
   | Klass Name [Expr]
+  | If Expr [Expr] [Expr]
   deriving (Eq, Ord, Show)
 
 {-data Op
