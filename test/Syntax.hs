@@ -4,6 +4,7 @@ type Name = String
 
 data Expr
   = Float Double
+  | String String
   | Var String
   | Call Name [Expr]
   | Function Name [Expr] [Expr]

@@ -39,5 +39,6 @@ struktur hej
         async efter 5 kalle2()
         async efter 5 före 3 kalle3()
         async före 4 kalle4()
+        a = "kalle asd asd"
 	klar
 meep

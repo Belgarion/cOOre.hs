@@ -40,6 +40,11 @@ floating = do
   n <- float
   return $ Float n
 
+strings :: Parser Expr
+strings = do
+  s <- str
+  return $ String s
+
 expr :: Parser Expr
 expr = try exprnum
     <|> exprctlr
@@ -80,6 +85,7 @@ call = do
 factor :: Parser Expr
 factor = try floating
       <|> try int
+      <|> try strings
       <|> try extern
       <|> try function
       <|> try call

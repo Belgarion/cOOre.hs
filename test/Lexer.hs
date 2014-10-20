@@ -23,6 +23,9 @@ integer = Tok.integer lexer
 float :: Parser Double
 float = Tok.float lexer
 
+str :: Parser String
+str = Tok.stringLiteral lexer
+
 parens :: Parser a -> Parser a
 parens = Tok.parens lexer
 
