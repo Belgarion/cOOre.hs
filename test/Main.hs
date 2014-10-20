@@ -11,6 +11,9 @@ import System.IO
 import System.Environment
 import System.Console.Haskeline
 
+import TypeCheck
+import PrettyPrinting
+
 process :: String -> IO ()
 process line = do
   let res = parseToplevel line
@@ -36,7 +39,14 @@ main = do
   args <- getArgs
   case args of
     []      -> repl
-    [fname] -> processFile fname >> return ()
+    [fname] -> do
+        file <- readFile fname
+        process file
+        let ast = parseToplevel file
+        case ast of
+            Left err -> print ""
+            Right ex -> putStrLn (printAst ex 0)
+        return ()
 
 --import qualified LLVM.General.AST as AST
 

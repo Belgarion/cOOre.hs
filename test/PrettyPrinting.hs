@@ -1,0 +1,27 @@
+module PrettyPrinting where
+
+import Syntax
+
+join :: String -> [String] -> String
+join _ [] = ""
+join delim (x:xs) = x ++ delim ++ (join delim xs)
+
+ind :: Int -> String
+ind 0 = ""
+ind x = (ind (x-1)) ++ "  "
+
+printAst :: [Expr] -> Int-> String
+printAst [] _ = ""
+printAst((Klass name expr):ast) depth = (ind depth) ++ "struktur " ++ name ++ "\n" ++ (printAst expr (depth+1)) ++ "meep\n" ++ (printAst ast depth)
+printAst((Function name params stmts):ast) depth = (ind depth) ++ "def " ++ name ++ "(" ++ (printAst params 0) ++ ")\n" ++ (join "\n" ([printAst [i] (depth+1) | i <- stmts])) ++ "\n" ++ (ind depth) ++ "klar\n" ++ (printAst ast depth)
+printAst((Var name):ast) depth = (ind depth) ++ name ++ " " ++ (printAst ast depth)
+printAst((BinaryOp name left right):ast) depth = (ind depth) ++ (printAst [left] 0) ++ " " ++ name ++ " " ++ (printAst [right] 0) ++ " " ++  (printAst ast depth)
+printAst((Call name params):ast) depth = (ind depth) ++ name ++ "(" ++ (printAst params 0) ++ ")" ++ (printAst ast depth)
+printAst((Float value):ast) depth = (ind depth) ++ (show value) ++ (printAst ast depth)
+printAst((Int value):ast) depth = (ind depth) ++ (show value) ++ (printAst ast depth)
+printAst((Async after before stmt):ast) depth = (ind depth) ++ "async efter " ++ (printAst [after] 0) ++ " före " ++ (printAst [before] 0) ++ " " ++ (printAst [stmt] 0) ++ (printAst ast depth)
+printAst((If cond true false):ast) depth = (ind depth) ++ "om " ++ (printAst [cond] 0) ++ "\n" ++ (printAst true (depth+1)) ++ "\n" ++ (ind depth) ++ "annars\n" ++ (printAst false (depth+1)) ++ "\n" ++ (ind depth) ++ "klar" ++ (printAst ast depth)
+printAst((For init cond after stmts):ast) depth = (ind depth) ++ "för " ++ (printAst [init] 0) ++ " " ++ (printAst [cond] 0) ++ " " ++ (printAst [after] 0) ++ "\n" ++ (join "\n" ([printAst [i] (depth+1) | i <- stmts])) ++ "\n" ++ (ind depth) ++ "klar" ++ (printAst ast depth)
+printAst((String string):ast) depth = (ind depth) ++ "\"" ++ string ++ "\""
+printAst (expr:ast) depth = (ind depth) ++ "other :: " ++ (show expr) ++ (printAst ast depth)
+

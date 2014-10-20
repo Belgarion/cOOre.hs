@@ -33,7 +33,7 @@ binops = [[binary "=" Ex.AssocLeft]
 int :: Parser Expr
 int = do
   n <- integer
-  return $ Float (fromInteger n)
+  return $ Int n
 
 floating :: Parser Expr
 floating = do
@@ -79,7 +79,7 @@ extern = do
 call :: Parser Expr
 call = do
   name <- identifier
-  args <- parens $ commaSep expr
+  args <- parens $ many expr
   return $ Call name args
 
 factor :: Parser Expr
@@ -121,8 +121,8 @@ for = do
 async :: Parser Expr
 async = do
     reserved "async"
-    after <- option (Float (fromInteger 0)) (do{reserved "efter"; d<-int; return d})
-    before <- option (Float (fromInteger 0)) (do{reserved "före"; d<-int; return d})
+    after <- option (Int 0) (do{reserved "efter"; d<-int; return d})
+    before <- option (Int 0) (do{reserved "före"; d<-int; return d})
     body <- call
     return $ Async before after body
 
