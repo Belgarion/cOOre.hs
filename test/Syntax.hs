@@ -15,6 +15,7 @@ data Expr
   | Klass Name [Expr]
   | If Expr [Expr] [Expr]
   | For Expr Expr Expr [Expr]
+  | Async Expr Expr Expr
   deriving (Eq, Ord, Show)
 
 {-data Op

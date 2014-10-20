@@ -34,5 +34,10 @@ struktur hej
             kalle+3
             kalle+4
         klar
+
+        async kalle1()
+        async efter 5 kalle2()
+        async efter 5 före 3 kalle3()
+        async före 4 kalle4()
 	klar
 meep

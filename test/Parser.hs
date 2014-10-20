@@ -83,6 +83,7 @@ factor = try floating
       <|> try extern
       <|> try function
       <|> try call
+      <|> try async
       <|> variable
       <|> parens expr
 
@@ -110,6 +111,14 @@ for = do
     body <- many expr
     reserved "klar"
     return $ For before cond after body
+
+async :: Parser Expr
+async = do
+    reserved "async"
+    after <- option (Float (fromInteger 0)) (do{reserved "efter"; d<-int; return d})
+    before <- option (Float (fromInteger 0)) (do{reserved "före"; d<-int; return d})
+    body <- call
+    return $ Async before after body
 
 defn :: Parser Expr
 defn = try extern
