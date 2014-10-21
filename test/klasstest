@@ -20,7 +20,7 @@ struktur hej
 		klar
 	klar
 
-	def foobar(x y)
+	hel foobar(x y)
 		om 6 = 6
 			a = 10
 		annars om 6 = 5
@@ -40,5 +40,13 @@ struktur hej
         async efter 5 före 3 kalle3()
         async före 4 kalle4()
         a = "kalle asd asd"
+        återvänd kalle(1) + 1
+	klar
+meep
+
+struktur kalle
+	def foo(x y)
+		kalle+1
+		återvänd 
 	klar
 meep

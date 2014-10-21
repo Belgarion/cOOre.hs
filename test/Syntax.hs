@@ -6,9 +6,11 @@ data Expr
   = Float Double
   | Int Integer
   | String String
+  | Void
   | Var String
   | Call Name [Expr]
-  | Function Name [Expr] [Expr]
+  | Function String Name [Expr] [Expr]
+  | Return Expr
   | Extern Name [Expr]
   | BinaryDef Name [Name] Expr
   | UnaryDef Name [Name] Expr

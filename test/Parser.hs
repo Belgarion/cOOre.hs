@@ -45,6 +45,7 @@ strings = do
   s <- str
   return $ String s
 
+
 expr :: Parser Expr
 expr = try exprnum
     <|> exprctlr
@@ -53,7 +54,7 @@ exprnum :: Parser Expr
 exprnum = Ex.buildExpressionParser (binops) factor
 
 exprctlr :: Parser Expr
-exprctlr = _if <|> for
+exprctlr = _if <|> for <|> _return
 
 variable :: Parser Expr
 variable = do
@@ -62,12 +63,19 @@ variable = do
 
 function :: Parser Expr
 function = do
-  reserved "def"
+  t <- choice [reservedReturn "def",reservedReturn "hel",reservedReturn "flyt",reservedReturn "sträng"]
   name <- identifier
   args <- parens $ many variable
   body <- many expr
   reserved "klar"
-  return $ Function name args body
+  return $ Function t name args body
+
+--ret <- option (Void) (do{reserved "återvänd"; d<-expr; return d})
+
+reservedReturn :: String -> Parser String
+reservedReturn x = do
+  reserved x
+  return x
 
 extern :: Parser Expr
 extern = do
@@ -92,6 +100,12 @@ factor = try floating
       <|> try async
       <|> variable
       <|> parens expr
+
+_return :: Parser Expr
+_return = do 
+    reserved "återvänd"
+    value <- option (Void) (do{ d<-expr; return d})
+    return $ Return value
 
 _if :: Parser Expr
 _if = do
