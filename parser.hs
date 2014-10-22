@@ -1,149 +1,181 @@
 module Parser where
 
-import Text.ParserCombinators.Parsec hiding (spaces)
+import Text.Parsec
+import Text.Parsec.String (Parser)
+
+import qualified Text.Parsec.Expr as Ex
+import qualified Text.Parsec.Token as Tok
+
+-- inflix fmap
+import Control.Applicative ((<$>))
+import Lexer
+import Syntax
+
+--binop = Ex.Infix (BinaryOp <$> op) Ex.AssocLeft
+--unop = Ex.Prefix (UnaryOp <$> op)
+
+binary s assoc = Ex.Infix (reservedOp s >> return (BinaryOp s)) assoc
+
+op :: Parser String
+op = do
+  whitespace
+  o <- operator
+  whitespace
+  return o
+
+binops = [[binary "=" Ex.AssocLeft]
+         ,[binary "*" Ex.AssocLeft,
+           binary "/" Ex.AssocLeft]
+         ,[binary "+" Ex.AssocLeft,
+           binary "-" Ex.AssocLeft]
+         ,[binary "<" Ex.AssocLeft]]
+
+int :: Parser Expr
+int = do
+  n <- integer
+  return $ Int n
+
+floating :: Parser Expr
+floating = do
+  n <- float
+  return $ Float n
+
+strings :: Parser Expr
+strings = do
+  s <- str
+  return $ String s
 
 
-parseExpr :: Parser LispVal
-parseExpr = parseAtom
-          <|> parseString
-          <|> try parseChar
-          <|> try parseComplex
-          <|> try parseFloat
-          <|> try parseRatio
-          <|> try parseNumber
-          <|> parseBool
-          <|> parseQuoted
-          <|> parseQuasiquote
-          <|> try parseUnquoteSplicing
-          <|> parseUnquote
-          <|> parseList
+expr :: Parser Expr
+expr = try exprnum
+    <|> exprctlr
 
-parseAtom :: Parser LispVal
-parseAtom = do first <- letter <|> symbol
-               rest <- many (letter <|> digit <|> symbol)
-               (return . Atom) (first:rest)
+exprnum :: Parser Expr
+exprnum = Ex.buildExpressionParser (binops) factor
 
-parseList :: Parser LispVal
-parseList = char '(' >> parseList1
+exprctlr :: Parser Expr
+exprctlr = _if <|> for <|> _return <|> claim
 
-parseList1 :: Parser LispVal
-parseList1 = (char ')' >> (return . List) []) 
-               <|> do expr <- parseExpr
-                      parseList2 [expr]
+variable :: Parser Expr
+variable = do
+  var <- identifier
+  return $ Var var
 
-parseList2 :: [LispVal] -> Parser LispVal
-parseList2 expr = (char ')' >> (return . List) (reverse expr)) 
-                    <|> (spaces >> parseList3 expr)
+function :: Parser Expr
+function = do
+  t <- choice [reservedReturn "def",reservedReturn "hel",reservedReturn "flyt",reservedReturn "sträng"]
+  name <- identifier
+  args <- parens $ many variable
+  body <- many expr
+  reserved "klar"
+  return $ Function t name args body
 
-parseList3 :: [LispVal] -> Parser LispVal
-parseList3 expr = do char '.' >> spaces
-                     dotted <- parseExpr
-                     char ')'
-                     return $ DottedList expr dotted
-                  <|> do next <- parseExpr
-                         parseList2 (next:expr)
+--ret <- option (Void) (do{reserved "återvänd"; d<-expr; return d})
 
-parseQuoted :: Parser LispVal
-parseQuoted = do char '\''
-                 x <- parseExpr
-                 return $ List [Atom "quote", x]
+reservedReturn :: String -> Parser String
+reservedReturn x = do
+  reserved x
+  return x
 
-parseNumber :: Parser LispVal
-parseNumber = parsePlainNumber <|> parseRadixNumber
+extern :: Parser Expr
+extern = do
+  reserved "extern"
+  name <- identifier
+  args <- parens $ many variable
+  return $ Extern name args
 
-parsePlainNumber :: Parser LispVal
-parsePlainNumber = many1 digit >>= return . Number . read
+call :: Parser Expr
+call = do
+  name <- identifier
+  args <- parens $ many expr
+  return $ Call name args
 
-parseRadixNumber :: Parser LispVal
-parseRadixNumber = char '#' >> 
-                   (
-                        parseDecimal 
-                        <|> parseBinary
-                        <|> parseOctal
-                        <|> parseHex
-                   )
+factor :: Parser Expr
+factor = try floating
+      <|> try int
+      <|> try strings
+      <|> try extern
+      <|> try function
+      <|> try call
+      <|> try async
+      <|> variable
+      <|> parens expr
 
-parseDecimal :: Parser LispVal
-parseDecimal = do char 'd'
-                  n <- many1 digit
-                  (return . Number . read) n
+claim :: Parser Expr
+claim = do
+    reserved "begär"
+    name <- identifier
+    stmts <- many expr
+    reserved "klar"
+    return $ Claim name stmts
 
-parseBinary :: Parser LispVal
-parseBinary = do char 'b'
-                 n <- many $ oneOf "01"
-                 (return . Number . bin2int) n
 
-parseOctal :: Parser LispVal
-parseOctal = do char 'o'
-                n <- many $ oneOf "01234567"
-                (return . Number . (readWith readOct)) n
+_return :: Parser Expr
+_return = do 
+    reserved "återvänd"
+    value <- option (Void) (do{ d<-expr; return d})
+    return $ Return value
 
-parseHex :: Parser LispVal
-parseHex = do char 'x'
-              n <- many $ oneOf "0123456789abcdefABCDEF"
-              (return . Number . (readWith readHex)) n
+_if :: Parser Expr
+_if = do
+    reserved "om"
+    cond <- expr
+    tbod <- many expr
+    ebod <- option [] _else
+    reserved "klar"
+    return $ If cond tbod ebod
 
-parseRatio :: Parser LispVal
-parseRatio = do num <- fmap read $ many1 digit
-                char '/'
-                denom <- fmap read $ many1 digit
-                (return . Ratio) (num % denom)
+_else :: Parser [Expr]
+_else = do
+    reserved "annars"
+    ebod <- many expr
+    return ebod
 
-parseFloat :: Parser LispVal
-parseFloat = do whole <- many1 digit
-                char '.'
-                decimal <- many1 digit
-                return $ Float (read (whole++"."++decimal))
+for :: Parser Expr
+for = do
+    reserved "för"
+    before <- expr
+    cond <- expr
+    after <- expr
+    body <- many expr
+    reserved "klar"
+    return $ For before cond after body
 
-parseComplex :: Parser LispVal
-parseComplex = do r <- fmap toDouble (try parseFloat <|> parsePlainNumber)
-                  char '+'
-                  i <- fmap toDouble (try parseFloat <|> parsePlainNumber)
-                  char 'i'
-                  (return . Complex) (r :+ i)
-               where toDouble (Float x) = x
-                     toDouble (Number x) = fromIntegral x
+async :: Parser Expr
+async = do
+    reserved "async"
+    after <- option (Int 0) (do{reserved "efter"; d<-int; return d})
+    before <- option (Int 0) (do{reserved "före"; d<-int; return d})
+    body <- call
+    return $ Async before after body
 
-parseString :: Parser LispVal
-parseString = do char '"'
-                 s <- many (escapedChars <|> (noneOf ['\\', '"']))
-                 char '"'
-                 (return . String) s
+defn :: Parser Expr
+defn = try extern
+    <|> try function
+    <|> expr
 
-parseChar :: Parser LispVal
-parseChar = do string "#\\"
-               s <- many1 letter
-               return $ case (map toLower s) of
-                      "space" -> Char ' '
-                      "newline" -> Char '\n'
-                      [x] -> Char x
+contents :: Parser a -> Parser a
+contents p = do
+  Tok.whiteSpace lexer
+  r <- p
+  eof
+  return r
 
-parseBool :: Parser LispVal
-parseBool = do char '#'
-               c <- oneOf "tf"
-               return $ case c of
-                      't' -> Bool True
-                      'f' -> Bool False
+toplevel :: Parser [Expr]
+toplevel = many $ do
+    def <- klass
+    return def
 
-parseQuasiquote :: Parser LispVal
-parseQuasiquote = do char '`'
-                     expr <- parseExpr
-                     return $ List [Atom "quasiquote", expr]
+klass :: Parser Expr
+klass = do
+    reserved "struktur"
+    name <- identifier
+    stmts <- many defn
+    reserved "meep"
+    return $ Klass name stmts
 
--- Bug: this allows the unquote to appear outside of a quasiquoted list
-parseUnquote :: Parser LispVal
-parseUnquote = do char ','
-                  expr <- parseExpr
-                  return $ List [Atom "unquote", expr]
+parseExpr :: String -> Either ParseError Expr
+parseExpr s = parse (contents expr) "<stdin>" s
 
--- Bug: this allows unquote-splicing to appear outside of a quasiquoted list
-parseUnquoteSplicing :: Parser LispVal
-parseUnquoteSplicing = do string ",@"
-                          expr <- parseExpr
-                          return $ List [Atom "unquote-splicing", expr]
-
-parseVector :: Parser LispVal
-parseVector = do string "#("
-                 elems <- sepBy parseExpr spaces
-                 char ')'
-                 return $ Vector (listArray (0, (length elems)-1) elems)
+parseToplevel :: String -> Either ParseError [Expr]
+parseToplevel s = parse (contents toplevel) "<stdin>" s

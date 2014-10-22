@@ -1,0 +1,54 @@
+struktur hej
+	def foo(x y) 
+		kalle+1
+		kalle+1
+		kalle = 10+2
+	klar
+
+	def foo2(x y) 
+		x+foo2(y 4.0)
+		om 4=3
+			v = 6
+		annars
+			v = 66
+		klar
+	klar
+
+	def foo3(x y)
+		om 5=5
+			a = 5
+		klar
+	klar
+
+	hel foobar(x y)
+		om 6 = 6
+			a = 10
+		annars om 6 = 5
+			a = 20
+			klar
+		klar
+
+        för a=5 5=5 a=6
+            kalle+1
+            kalle+2
+            kalle+3
+            kalle+4
+        klar
+
+        async kalle1()
+        async efter 5 kalle2()
+        async efter 5 före 3 kalle3()
+        async före 4 kalle4()
+        a = "kalle asd asd"
+        återvänd kalle(1) + 1
+	klar
+meep
+
+struktur kalle
+	def foo(x y)
+		begär kalle
+			kalle+1
+		klar
+		återvänd 
+	klar
+meep
