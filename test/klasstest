@@ -46,7 +46,9 @@ meep
 
 struktur kalle
 	def foo(x y)
-		kalle+1
+		begär kalle
+			kalle+1
+		klar
 		återvänd 
 	klar
 meep

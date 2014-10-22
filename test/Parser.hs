@@ -54,7 +54,7 @@ exprnum :: Parser Expr
 exprnum = Ex.buildExpressionParser (binops) factor
 
 exprctlr :: Parser Expr
-exprctlr = _if <|> for <|> _return
+exprctlr = _if <|> for <|> _return <|> claim
 
 variable :: Parser Expr
 variable = do
@@ -100,6 +100,15 @@ factor = try floating
       <|> try async
       <|> variable
       <|> parens expr
+
+claim :: Parser Expr
+claim = do
+    reserved "begär"
+    name <- identifier
+    stmts <- many expr
+    reserved "klar"
+    return $ Claim name stmts
+
 
 _return :: Parser Expr
 _return = do 

@@ -11,6 +11,7 @@ data Expr
   | Call Name [Expr]
   | Function String Name [Expr] [Expr]
   | Return Expr
+  | Claim Name [Expr]
   | Extern Name [Expr]
   | BinaryDef Name [Name] Expr
   | UnaryDef Name [Name] Expr
