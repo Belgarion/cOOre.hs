@@ -14,6 +14,8 @@ import System.Console.Haskeline
 import TypeCheck
 import PrettyPrinting
 
+import Data.Map
+
 process :: String -> IO ()
 process line = do
   let res = parseToplevel line
@@ -48,7 +50,7 @@ main = do
             Right ex -> putStrLn (printAst ex 0)
         case ast of
             Left err -> print ""
-            Right ex -> putStrLn $ join "\n" (typecheck ex [])
+            Right ex -> putStrLn $ join "\n" (typecheck ex Data.Map.empty)
         return ()
 
 --import qualified LLVM.General.AST as AST
