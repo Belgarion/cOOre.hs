@@ -1,6 +1,7 @@
 module Syntax where
 
 type Name = String
+type Type = String
 
 data Expr
   = Float Double
@@ -9,7 +10,7 @@ data Expr
   | Void
   | Var String
   | Call Name Name [Expr]
-  | Function String Name [Expr] [Expr]
+  | Function Type Name [Expr] [Expr]
   | Return Expr
   | Claim Name [Expr]
   | Extern Name [Expr]
