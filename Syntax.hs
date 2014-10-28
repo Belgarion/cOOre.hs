@@ -8,7 +8,7 @@ data Expr
   | String String
   | Void
   | Var String
-  | Call Name [Expr]
+  | Call Name Name [Expr]
   | Function String Name [Expr] [Expr]
   | Return Expr
   | Claim Name [Expr]

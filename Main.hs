@@ -23,6 +23,10 @@ process line = do
     Left err -> print err
     Right ex -> mapM_ print ex
 
+processFile :: String -> IO ()
+processFile fname = readFile fname >>= process
+
+
 repl :: IO ()
 repl = runInputT defaultSettings loop
   where
@@ -31,10 +35,6 @@ repl = runInputT defaultSettings loop
     case minput of
       Nothing -> outputStrLn "Goodbye."
       Just input -> (liftIO $ process input) >> loop
-
-
-processFile :: String -> IO ()
-processFile fname = readFile fname >>= process
 
 main :: IO ()
 main = do

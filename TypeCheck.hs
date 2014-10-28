@@ -45,7 +45,7 @@ typecheck ((BinaryOp name left right):ast) env =
                         Just s -> s
                 otherwise -> (env, "Unmatched types: " ++ (show left) ++ " " ++ (show right))
             otherwise -> (env, "")
-typecheck ((Call name params):ast) env = typecheck (params ++ ast) env
+typecheck ((Call _ name params):ast) env = typecheck (params ++ ast) env
 typecheck ((Float value):ast) env = typecheck (ast) env
 typecheck ((Int value):ast) env = typecheck (ast) env
 typecheck ((Async after before stmt):ast) env = typecheck (stmt:ast) env

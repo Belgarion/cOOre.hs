@@ -11,6 +11,10 @@ import Control.Applicative ((<$>))
 import Lexer
 import Syntax
 
+import Control.Monad.Trans
+
+import System.IO
+
 --binop = Ex.Infix (BinaryOp <$> op) Ex.AssocLeft
 --unop = Ex.Prefix (UnaryOp <$> op)
 
@@ -86,9 +90,10 @@ extern = do
 
 call :: Parser Expr
 call = do
+  struct <- option ("") (do{ d<-identifier; reserved "§" ;return d})
   name <- identifier
   args <- parens $ many expr
-  return $ Call name args
+  return $ Call struct name args
 
 factor :: Parser Expr
 factor = try floating
@@ -179,3 +184,16 @@ parseExpr s = parse (contents expr) "<stdin>" s
 
 parseToplevel :: String -> Either ParseError [Expr]
 parseToplevel s = parse (contents toplevel) "<stdin>" s
+
+{-
+shittycode :: Either ParseError (Either ParseError [Expr]) -> Either ParseError [Expr]
+shittycode a = case a of
+      Left x -> Left x
+      Right (Left y) -> Left y
+      Right (Right z) -> Right z
+
+fileToAst :: String -> Either ParseError [Expr]
+fileToAst fname = do 
+    filec <- readFile fname
+    parseToplevel filec
+-}
