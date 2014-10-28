@@ -42,6 +42,12 @@ struktur hej
         a = "kalle asd asd"
         återvänd kalle(1) + 1
 	klar
+
+    hel test3()
+        fail = "hej"
+        fail + 1
+        fail + fail
+    klar
 meep
 
 struktur kalle

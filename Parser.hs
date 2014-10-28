@@ -6,6 +6,10 @@ import Text.Parsec.String (Parser)
 import qualified Text.Parsec.Expr as Ex
 import qualified Text.Parsec.Token as Tok
 
+import Control.Monad.Trans
+import System.IO
+import Text.Parsec.Prim
+
 -- inflix fmap
 import Control.Applicative ((<$>))
 import Lexer
@@ -179,3 +183,8 @@ parseExpr s = parse (contents expr) "<stdin>" s
 
 parseToplevel :: String -> Either ParseError [Expr]
 parseToplevel s = parse (contents toplevel) "<stdin>" s
+
+--parseToplevelf :: String -> Either ParseError [Expr]
+--parseToplevelf s = do
+--    f <- liftIO $ readFile s
+--    parseToplevel f

@@ -5,46 +5,31 @@ import Syntax
 import Data.Map
 import Dictionary
 
-type EnvType = (String, String)
-type Env = [EnvType]
-
 typecheck :: [Expr] -> Data.Map.Map String String -> [String]
 typecheck [] _ = []
 typecheck ((Klass name expr):ast) env = typecheck (expr ++ ast) env
 typecheck ((Function t name params stmts):ast) env = typecheck (params ++ stmts ++ ast) env -- checka även params mot typer, lägg in funktionstyp i env
 typecheck ((Var name):ast) env = typecheck (ast) env
+    where newenv = Data.Map.insert name "type" env
 typecheck ((BinaryOp name left right):ast) env =
-    (x++" "++y):(typecheck (left:(right:ast)) env) -- lägg in i env vid =
+    (x):(typecheck (left:(right:ast)) newenv) -- lägg in i env vid =
     where
-        x = case (name) of
-            "=" -> case (left) of
-                (Var _) -> "= OK"
-                otherwise -> "= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ")"
-            otherwise -> name ++ " OK"
-        (newmap, y) = case (name) of
-            "=" -> case (right) of
-                (Int _) -> case (Dictionary.lookupinsert (show left) "int" env) of
-                    Nothing -> (env, "Already defined")
-                    Just nmap -> (nmap, "")
-                (Float _) -> case (Dictionary.lookupinsert (show left) "float" env) of
-                    Nothing -> (env, "Already defined")
-                    Just nmap -> (nmap, "")
-                (String _) -> case (Dictionary.lookupinsert (show left) "string" env) of
-                    Nothing -> (env, "Already defined")
-                    Just nmap -> (nmap, "")
-                otherwise -> (env, "Unsupported type: " ++ (show right))
+        (x, newenv) = case (name) of
+            "=" -> case (left, right) of
+                ((Var name),t) -> ("= OK " ++ name, Data.Map.insert name (typetostring t) env)
+                otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ")", env)
             "+" -> case (left, right) of
-                ((Int _),(Int _)) -> (env, "")
-                ((Float _),(Float _)) -> (env, "")
-                ((String _),(String _)) -> (env, "")
-                ((Var _),t) -> if ts==ts2 then (env, "") else (env, "Unmatched types: " ++ ts2 ++ " " ++ ts)
+                ((Int _),(Int _)) -> ("+ OK", env)
+                ((Float _),(Float _)) -> ("+ OK", env)
+                ((String _),(String _)) -> (" + OK", env)
+                ((Var name),t) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts2 ++ ") (" ++ ts ++ ")", env)
                     where
                     ts = typetostring t
-                    ts2 = case (Data.Map.lookup (show left) env) of
-                        Nothing -> "undeclared variable"
+                    ts2 = case (Data.Map.lookup (name) env) of
+                        Nothing -> "undeclared variable " ++ name
                         Just s -> s
-                otherwise -> (env, "Unmatched types: " ++ (show left) ++ " " ++ (show right))
-            otherwise -> (env, "")
+                otherwise -> ("+ ERROR: Unmatched types: (" ++ (show left) ++ ") (" ++ (show right) ++ ")", env)
+            otherwise -> ("Unhandled binaryop " ++ name, env)
 typecheck ((Call name params):ast) env = typecheck (params ++ ast) env
 typecheck ((Float value):ast) env = typecheck (ast) env
 typecheck ((Int value):ast) env = typecheck (ast) env
@@ -54,6 +39,7 @@ typecheck ((For init cond after stmts):ast) env = typecheck (init:(cond:(after:(
 typecheck ((String string):ast) env = typecheck ast env
 typecheck ((Void):ast) env = typecheck ast env
 typecheck ((Return expr):ast) env = typecheck (expr:ast) env
+typecheck ((Claim name stmts):ast) env = typecheck (stmts ++ ast) env
 typecheck (expr:ast) env = ("Other " ++ (show expr)):(typecheck ast env)
 
 typetostring :: Expr -> String
