@@ -5,7 +5,7 @@ struktur hej
 		kalle = 10+2
 	klar
 
-	def foo2(x y)
+	hel foo2(x y)
 		x+hej§foo2(y 4.0)
 		om 4=3
 			v = 6
