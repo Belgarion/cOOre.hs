@@ -203,12 +203,27 @@ klass = do
     reserved "meep"
     return $ Klass name stmts
 
+{-
+include :: Parser [Expr]
+include = do
+    reserved "referera"
+    name <- identifier
+    ast <- fileToAst name
+    case ast of
+      Left _ -> return [Void]
+      Right x -> return x
+-}
+
 parseExpr :: String -> Either ParseError Expr
 parseExpr s = parse (contents expr) "<stdin>" s
 
 parseToplevel :: String -> Either ParseError [Expr]
 parseToplevel s = parse (contents toplevel) "<stdin>" s
 
+fileToAst :: String -> IO(Either ParseError [Expr])
+fileToAst fname = do
+    filec <- readFile fname
+    return $ parseToplevel filec
 
 {-
 shittycode :: Either ParseError (Either ParseError [Expr]) -> Either ParseError [Expr]
