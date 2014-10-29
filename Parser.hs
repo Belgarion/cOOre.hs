@@ -73,11 +73,17 @@ function :: Parser Expr
 function = do
   t <- choice [reservedReturn "def",reservedReturn "hel",reservedReturn "flyt",reservedReturn "sträng"]
   name <- identifier
-  args <- parens $ many variable
+  args <- parens $ many arg
   body <- many expr
   reserved "klar"
   return $ Function t name args body
 
+arg :: Parser Expr
+arg = do 
+  var <- variable
+  reservedOp "="
+  typ <- types
+  return $ BinaryOp "=" var typ
 --ret <- option (Void) (do{reserved "återvänd"; d<-expr; return d})
 
 reservedReturn :: String -> Parser String
@@ -111,15 +117,18 @@ callOutside = do
 
 
 factor :: Parser Expr
-factor = try floating
-      <|> try int
-      <|> try strings
+factor = types
       <|> try extern
       <|> try function
       <|> try call
       <|> try async
       <|> variable
       <|> parens expr
+
+types :: Parser Expr
+types =  try floating
+      <|> try int
+      <|> try strings
 
 claim :: Parser Expr
 claim = do
