@@ -103,7 +103,7 @@ callInside = do
 
 callOutside :: Parser Expr
 callOutside = do
-  struct <-identifier; 
+  struct <-identifier;
   reservedOp "§"
   name <- identifier
   args <- parens $ many expr

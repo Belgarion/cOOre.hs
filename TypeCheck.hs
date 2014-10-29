@@ -65,4 +65,8 @@ typetostring (Void) _ = "void"
 typetostring (Var name) env = case (Data.Map.lookup (name) env) of
                         Nothing -> "undeclared variable " ++ name
                         Just s -> s
+typetostring (BinaryOp op left right) env =
+    if (typetostring left env) == (typetostring right env)
+    then (typetostring left env)
+    else ("Unmatched types : (" ++ (typetostring left env) ++ ") (" ++ (typetostring right env) ++ ")")
 typetostring x _ = "unknown (" ++ (show x) ++ ")"

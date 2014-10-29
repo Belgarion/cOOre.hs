@@ -1,11 +1,11 @@
 struktur hej
-	def foo(x y) 
+	def foo(x y)
 		kalle+1
 		kalle+1
 		kalle = 10+2
 	klar
 
-	def foo2(x y) 
+	def foo2(x y)
 		x+hej§foo2(y 4.0)
 		om 4=3
 			v = 6
@@ -47,6 +47,7 @@ struktur hej
         fail = "hej"
         fail + 1
         fail + fail
+        5 +5 +5 +5
     klar
 meep
 
@@ -55,6 +56,6 @@ struktur kalle
 		begär kalle
 			kalle+1
 		klar
-		återvänd 
+		återvänd
 	klar
 meep
