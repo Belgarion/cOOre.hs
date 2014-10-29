@@ -8,6 +8,7 @@ struktur hej
 
 	hel foo2(x=1 y=2)
         x=3
+    klar
 
 	def foo2(x=0 y=0)
 		x+hej§foo2(y 4.0)
