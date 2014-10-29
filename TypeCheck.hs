@@ -60,6 +60,7 @@ typecheck ((String string):ast) funcenv env = typecheck ast funcenv env
 typecheck ((Void):ast) funcenv env = typecheck ast funcenv env
 typecheck ((Return expr):ast) funcenv env = typecheck (expr:ast) funcenv env
 typecheck ((Claim name stmts):ast) funcenv env = typecheck (stmts ++ ast) funcenv env
+typecheck ((Include filename stmts):ast) funcenv env = typecheck (stmts ++ ast) funcenv env
 typecheck (expr:ast) funcenv env =
     (newfuncenv, env, ("Other " ++ (show expr)):log) -- lägg in i env vid =
     where
