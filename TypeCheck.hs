@@ -5,42 +5,50 @@ import Syntax
 import Data.Map
 import Dictionary
 
+import Debug.Trace
+
 type FunctionsMap = Data.Map.Map String String
 type VariablesMap = Data.Map.Map String String
 
-typecheck :: [Expr] -> FunctionsMap -> VariablesMap -> (FunctionsMap, [String])
-typecheck [] funcenv _ = (funcenv, [])
+
+typecheck :: [Expr] -> FunctionsMap -> VariablesMap -> (FunctionsMap, VariablesMap, [String])
+typecheck [] funcenv env = (funcenv, env, [])
 typecheck ((Klass name expr):ast) funcenv env = typecheck (expr ++ ast) funcenv env
-typecheck ((Function t name params stmts):ast) funcenv env = typecheck (params ++ stmts ++ ast) funcenv env -- checka även params mot typer, lägg in funktionstyp i env
+typecheck ((Function t name params stmts):ast) funcenv env =
+    typecheck (params ++ stmts ++ ast) newfuncenv env
+    where
+        newfuncenv = Data.Map.insert name t funcenv
+    -- checka även params mot typer
 typecheck ((Var name):ast) funcenv env = typecheck (ast) funcenv env
 typecheck ((BinaryOp name left right):ast) funcenv env =
-    (newfuncenv, (x):log) -- lägg in i env vid =
+    (newfuncenv2, env, (x):(log ++ log2)) -- lägg in i env vid =
     where
-        (newfuncenv, log) = (typecheck (left:(right:ast)) funcenv newenv)
+        (newfuncenv2, newenv3, log2) = (typecheck ast newfuncenv newenv2)
+        (newfuncenv, newenv2, log) = (typecheck (left:(right:[])) funcenv newenv)
         (x, newenv) = case (name) of
             "=" -> case (left, right) of
-                ((Var name),t) -> ("= OK " ++ name, Data.Map.insert name (typetostring t env) env)
+                ((Var name),t) -> ("= OK " ++ name, Data.Map.insert name (typetostring t funcenv env) env)
                 otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ")", env)
             "+" -> case (left, right) of
                 (t,t2) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")", env)
                     where
-                    ts = typetostring t env
-                    ts2 = typetostring t2 env
+                    ts = typetostring t funcenv env
+                    ts2 = typetostring t2 funcenv env
             "-" -> case (left, right) of
-                (t,t2) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")", env)
+                (t,t2) -> if ts==ts2 then ("- OK", env) else ("- ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")", env)
                     where
-                    ts = typetostring t env
-                    ts2 = typetostring t2 env
+                    ts = typetostring t funcenv env
+                    ts2 = typetostring t2 funcenv env
             "*" -> case (left, right) of
-                (t,t2) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")", env)
+                (t,t2) -> if ts==ts2 then ("* OK", env) else ("* ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")", env)
                     where
-                    ts = typetostring t env
-                    ts2 = typetostring t2 env
+                    ts = typetostring t funcenv env
+                    ts2 = typetostring t2 funcenv env
             "/" -> case (left, right) of
-                (t,t2) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")", env)
+                (t,t2) -> if ts==ts2 then ("/ OK", env) else ("/ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")", env)
                     where
-                    ts = typetostring t env
-                    ts2 = typetostring t2 env
+                    ts = typetostring t funcenv env
+                    ts2 = typetostring t2 funcenv env
             otherwise -> ("Unhandled binaryop " ++ name, env)
 typecheck ((Call _ name params):ast) funcenv env = typecheck (params ++ ast) funcenv env
 typecheck ((Float value):ast) funcenv env = typecheck (ast) funcenv env
@@ -53,20 +61,24 @@ typecheck ((Void):ast) funcenv env = typecheck ast funcenv env
 typecheck ((Return expr):ast) funcenv env = typecheck (expr:ast) funcenv env
 typecheck ((Claim name stmts):ast) funcenv env = typecheck (stmts ++ ast) funcenv env
 typecheck (expr:ast) funcenv env =
-    (newfuncenv, ("Other " ++ (show expr)):log) -- lägg in i env vid =
+    (newfuncenv, env, ("Other " ++ (show expr)):log) -- lägg in i env vid =
     where
-        (newfuncenv, log) = (typecheck ast newfuncenv env)
+        (newfuncenv, newenv, log) = (typecheck ast newfuncenv env)
 
-typetostring :: Expr -> Data.Map.Map String String -> String
-typetostring (String _) _ = "string"
-typetostring (Int _) _ = "int"
-typetostring (Float _) _ = "float"
-typetostring (Void) _ = "void"
-typetostring (Var name) env = case (Data.Map.lookup (name) env) of
+typetostring :: Expr -> FunctionsMap -> VariablesMap-> String
+typetostring (String _) _ _ = "sträng"
+typetostring (Int _) _ _ = "hel"
+typetostring (Float _) _ _ = "flyt"
+typetostring (Void) _ _ = "def"
+typetostring (Var name) funcenv env = case (Data.Map.lookup (name) env) of
                         Nothing -> "undeclared variable " ++ name
                         Just s -> s
-typetostring (BinaryOp op left right) env =
-    if (typetostring left env) == (typetostring right env)
-    then (typetostring left env)
-    else ("Unmatched types : (" ++ (typetostring left env) ++ ") (" ++ (typetostring right env) ++ ")")
-typetostring x _ = "unknown (" ++ (show x) ++ ")"
+typetostring (BinaryOp op left right) funcenv env =
+    if (typetostring left funcenv env) == (typetostring right funcenv env)
+    then (typetostring left funcenv env)
+    else ("Unmatched types : (" ++ (typetostring left funcenv env) ++ ") (" ++ (typetostring right funcenv env) ++ ")")
+typetostring (Call klass name params) funcenv env = -- if klass == "" inom samma klass
+    case (Data.Map.lookup name funcenv) of
+        Nothing -> "Undeclared function " ++ name
+        Just s -> s
+typetostring x _ _ = "unknown (" ++ (show x) ++ ")"

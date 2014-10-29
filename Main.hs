@@ -51,7 +51,7 @@ main = do
         case ast of
             Left err -> print ""
             Right ex -> do
-                let (funcenv, log) = (typecheck ex Data.Map.empty Data.Map.empty)
+                let (funcenv, varenv, log) = (typecheck ex Data.Map.empty Data.Map.empty)
                 putStrLn $ join "\n" log
         return ()
 
