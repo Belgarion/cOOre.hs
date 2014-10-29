@@ -26,4 +26,5 @@ printAst((String string):ast) depth = (ind depth) ++ "\"" ++ string ++ "\""
 printAst((Void):ast) depth = ""
 printAst((Return expr):ast) depth = (ind depth) ++ "återvänd " ++ printAst [expr] 0
 printAst((Claim name stmts):ast) depth = (ind depth) ++ "begär " ++ name ++ "\n" ++ (printAst stmts (depth+1)) ++ "\n" ++ (ind depth) ++ "klar" ++ (printAst ast depth)
+printAst((Include name _):ast) depth = "referera " ++ name ++ "\n" ++ (printAst ast depth)
 printAst (expr:ast) depth = (ind depth) ++ "other :: " ++ (show expr) ++ (printAst ast depth)
