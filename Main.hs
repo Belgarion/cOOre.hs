@@ -50,7 +50,9 @@ main = do
             Right ex -> putStrLn (printAst ex 0)
         case ast of
             Left err -> print ""
-            Right ex -> putStrLn $ join "\n" (typecheck ex Data.Map.empty)
+            Right ex -> do
+                let (funcenv, log) = (typecheck ex Data.Map.empty Data.Map.empty)
+                putStrLn $ join "\n" log
         return ()
 
 --import qualified LLVM.General.AST as AST
