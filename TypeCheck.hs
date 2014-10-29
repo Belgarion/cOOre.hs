@@ -70,7 +70,7 @@ typetostring (String _) _ _ = "sträng"
 typetostring (Int _) _ _ = "hel"
 typetostring (Float _) _ _ = "flyt"
 typetostring (Void) _ _ = "def"
-typetostring (Var name) funcenv env = case (Data.Map.lookup (name) funcenv) of
+typetostring (Var name) funcenv env = case (Data.Map.lookup (name) env) of
                         Nothing -> "undeclared variable " ++ name
                         Just s -> s
 typetostring (BinaryOp op left right) funcenv env =
