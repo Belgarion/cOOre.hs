@@ -1,3 +1,5 @@
+referera klasstest2
+
 struktur hej
 	def foo(x="" y=1)
 		kalle+1

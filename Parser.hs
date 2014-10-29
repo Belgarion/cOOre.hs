@@ -18,6 +18,7 @@ import Syntax
 import Control.Monad.Trans
 
 import System.IO
+import System.IO.Unsafe
 
 --binop = Ex.Infix (BinaryOp <$> op) Ex.AssocLeft
 --unop = Ex.Prefix (UnaryOp <$> op)
@@ -192,7 +193,7 @@ contents p = do
 
 toplevel :: Parser [Expr]
 toplevel = many $ do
-    def <- klass
+    def <- klass <|> include
     return def
 
 klass :: Parser Expr
@@ -203,16 +204,14 @@ klass = do
     reserved "meep"
     return $ Klass name stmts
 
-{-
-include :: Parser [Expr]
+include :: Parser Expr
 include = do
     reserved "referera"
     name <- identifier
-    ast <- fileToAst name
+    let ast = unsafePerformIO $ fileToAst name
     case ast of
-      Left _ -> return [Void]
-      Right x -> return x
--}
+      Left _ -> return $ Include name []
+      Right x -> return $ Include name x
 
 parseExpr :: String -> Either ParseError Expr
 parseExpr s = parse (contents expr) "<stdin>" s
