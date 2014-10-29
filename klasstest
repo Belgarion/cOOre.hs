@@ -1,13 +1,15 @@
 struktur hej
-	def foo(x y)
+	def foo(x="" y=1)
 		kalle+1
 		kalle+1
         kalle = 3
 		kalle = 10+2
 	klar
 
-	hel foo2(x y)
+	hel foo2(x=1 y=2)
         x=3
+
+	def foo2(x=0 y=0)
 		x+hej§foo2(y 4.0)
 		om 4=3
 			v = 6
@@ -16,13 +18,13 @@ struktur hej
 		klar
 	klar
 
-	def foo3(x y)
+	def foo3(x=0 y=0)
 		om 5=5
 			a = 5
 		klar
 	klar
 
-	hel foobar(x y)
+	hel foobar(x=0 y=0)
 		om 6 = 6
 			a = 10
 		annars om 6 = 5
@@ -54,7 +56,7 @@ struktur hej
 meep
 
 struktur kalle
-	def foo(x y)
+	def foo(x=0 y=0)
 		begär kalle
 			kalle+1
 		klar
