@@ -2,10 +2,12 @@ struktur hej
 	def foo(x y)
 		kalle+1
 		kalle+1
+        kalle = 3
 		kalle = 10+2
 	klar
 
 	hel foo2(x y)
+        x=3
 		x+hej§foo2(y 4.0)
 		om 4=3
 			v = 6
@@ -58,4 +60,11 @@ struktur kalle
 		klar
 		återvänd
 	klar
+meep
+
+struktur sist
+    def aaa()
+        kalle = 2
+        kalle + 2
+    klar
 meep
