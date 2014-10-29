@@ -93,11 +93,22 @@ extern = do
   return $ Extern name args
 
 call :: Parser Expr
-call = do
-  struct <- option ("") (do{ d<-identifier; reserved "§" ;return d})
+call = try callInside <|> callOutside
+
+callInside :: Parser Expr
+callInside = do
+  name <- identifier
+  args <- parens $ many expr
+  return $ Call "" name args
+
+callOutside :: Parser Expr
+callOutside = do
+  struct <-identifier; 
+  reservedOp "§"
   name <- identifier
   args <- parens $ many expr
   return $ Call struct name args
+
 
 factor :: Parser Expr
 factor = try floating

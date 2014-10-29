@@ -6,7 +6,7 @@ struktur hej
 	klar
 
 	def foo2(x y) 
-		x+foo2(y 4.0)
+		x+hej§foo2(y 4.0)
 		om 4=3
 			v = 6
 		annars
