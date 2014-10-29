@@ -120,7 +120,7 @@ claim = do
 
 
 _return :: Parser Expr
-_return = do 
+_return = do
     reserved "återvänd"
     value <- option (Void) (do{ d<-expr; return d})
     return $ Return value
@@ -198,7 +198,7 @@ shittycode a = case a of
       Right (Right z) -> Right z
 
 fileToAst :: String -> Either ParseError [Expr]
-fileToAst fname = do 
+fileToAst fname = do
     filec <- readFile fname
     parseToplevel filec
 -}
