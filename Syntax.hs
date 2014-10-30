@@ -24,11 +24,3 @@ data Expr
   | For Expr Expr Expr [Expr]
   | Async Expr Expr Expr
   deriving (Eq, Ord, Show)
-
-{-data Op
-  = Plus
-  | Minus
-  | Times
-  | Divide
-  deriving (Eq, Ord, Show)
--}

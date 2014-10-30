@@ -224,21 +224,3 @@ fileToAst fname = do
     filec <- readFile fname
     return $ parseToplevel filec
 
-{-
-shittycode :: Either ParseError (Either ParseError [Expr]) -> Either ParseError [Expr]
-shittycode a = case a of
-      Left x -> Left x
-      Right (Left y) -> Left y
-      Right (Right z) -> Right z
-
-fileToAst :: String -> Either ParseError [Expr]
-fileToAst fname = do
-    filec <- readFile fname
-    parseToplevel filec
--}
-
---parseToplevelf :: String -> Either ParseError [Expr]
---parseToplevelf s = do
---    f <- liftIO $ readFile s
---    parseToplevel f
-
