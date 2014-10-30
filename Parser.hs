@@ -80,7 +80,7 @@ function = do
   return $ Function t name args body
 
 arg :: Parser Expr
-arg = do 
+arg = do
   var <- variable
   reservedOp "="
   typ <- types

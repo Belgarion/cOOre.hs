@@ -42,18 +42,20 @@ isFunc _ = False
 -- generates klass-struct
 --			klassname  ass 		struct
 genStruct :: String -> [Expr] -> String
-genStruct name stmts = "struct " ++ name ++ " {\n" ++ (genTypDef [x|x <- stmts, isAss x]) ++ "};\n" -- ++ (genTypDef [x | x <- stmts, isFunc x])
+genStruct name stmts = "struct struct_" ++ name ++ " {\n" ++ (genTypDef [x|x <- stmts, isAss x]) ++ "};\nstruct struct_" ++ name ++ " " ++ name ++ ";\n" -- ++ (genTypDef [x | x <- stmts, isFunc x])
 
 --			ast    klassnamn    indent  code
 codeGen :: [Expr] -> String -> Int -> String
 codeGen [] _ _ = ""
 codeGen ((Klass name stmts):ast) _ depth = genStruct name stmts ++ (codeGen stmts name depth) ++ "\n" ++ (codeGen ast "" depth)
-codeGen ((BinaryOp name left right):ast) klass depth = (codeGen [left] "" 0) ++ name ++ (codeGen [right] "" 0) ++ ";\n" ++ (codeGen ast klass depth)
-codeGen ((Function t name params stmts):ast) klass depth = (typestringToCtype t) ++ klass ++ "_" ++ name ++ "(" ++ (join ", " [(typeToCtype typ) ++ name | (BinaryOp "=" (Var name) typ) <- params]) ++ ") {\n" ++ (codeGen stmts klass depth) ++ "\n}\n"
-codeGen ((Var name):ast) klass depth = name
-codeGen ((Int value):ast) klass depth = show value
-codeGen ((Float value):ast) klass depth = show value
-codeGen ((String value):ast) klass depth = show value
-codeGen (expr:ast) klass depth = (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (codeGen ast klass depth)
+codeGen ((BinaryOp name left right):ast) klass depth = (codeGen [left] "" 0) ++ name ++ (codeGen [right] "" 0) ++ ";\n" ++ (codeGen ast klass (depth))
+codeGen ((Function t name params stmts):ast) klass depth = (ind depth) ++ (typestringToCtype t) ++ klass ++ "_" ++ name ++ "(" ++ (join ", " [(typeToCtype typ) ++ name | (BinaryOp "=" (Var name) typ) <- params]) ++ ") {\n" ++ (codeGen stmts klass (depth+1)) ++ "\n}\n" ++ (codeGen ast klass depth)
+codeGen ((Var name):ast) klass depth = name ++ " " ++ (codeGen ast klass depth)
+codeGen ((Int value):ast) klass depth = show value ++ (codeGen ast klass depth)
+codeGen ((Float value):ast) klass depth = show value ++ (codeGen ast klass depth)
+codeGen ((String value):ast) klass depth = show value ++ (codeGen ast klass depth)
+codeGen ((If cond th el):ast) klass depth = "if (" ++ (codeGen [cond] klass 0) ++ ") {\n" ++ (join "\n" [codeGen [x] klass (depth+1) | x <- th]) ++ "\n} else {\n" ++ (join "\n" [codeGen [x] klass (depth+1)| x <- el]) ++ "}\n" ++ (codeGen ast klass depth)
+codeGen ((Return value):ast) klass depth = "return " ++ (codeGen [value] klass 0) ++ ";\n" ++ (codeGen ast klass depth)
+codeGen (expr:ast) klass depth = (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (codeGen ast klass (depth+1))
 
 

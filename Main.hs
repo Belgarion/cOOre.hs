@@ -49,13 +49,9 @@ main = do
         let ast = parseToplevel file
         case ast of
             Left err -> print ""
-            Right ex -> putStrLn (printAst ex 0)
-        case ast of
-            Left err -> print ""
             Right ex -> do
+                putStrLn $ printAst ex 0
                 let (funcenv, varenv, log) = doTypecheck ex
                 putStrLn $ join "\n" log
-        case ast of
-              Left err -> print ""
-              Right ex -> putStrLn (codeGen ex "" 0)
+                putStrLn $ codeGen ex "" 0
         return ()
