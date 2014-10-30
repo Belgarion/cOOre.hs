@@ -56,6 +56,7 @@ codeGen ((Float value):ast) klass depth = show value ++ (codeGen ast klass depth
 codeGen ((String value):ast) klass depth = show value ++ (codeGen ast klass depth)
 codeGen ((If cond th el):ast) klass depth = "if (" ++ (codeGen [cond] klass 0) ++ ") {\n" ++ (join "\n" [codeGen [x] klass (depth+1) | x <- th]) ++ "\n} else {\n" ++ (join "\n" [codeGen [x] klass (depth+1)| x <- el]) ++ "}\n" ++ (codeGen ast klass depth)
 codeGen ((Return value):ast) klass depth = "return " ++ (codeGen [value] klass 0) ++ ";\n" ++ (codeGen ast klass depth)
+codeGen ((Call cklass name params):ast) klass depth = (ind depth) ++ cklass ++ "_" ++ name ++ "(" ++ (join ", " [codeGen [x] klass 0 | x <- params]) ++ ");\n" ++ (codeGen ast klass depth)
 codeGen (expr:ast) klass depth = (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (codeGen ast klass (depth+1))
 
 
