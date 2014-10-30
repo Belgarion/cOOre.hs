@@ -1,6 +1,5 @@
-referera klasstest3
-
-struktur jörgen
+referera loop1
+struktur sven
 	def foo(x=0 y=0)
 		begär kalle
 			kalle+1

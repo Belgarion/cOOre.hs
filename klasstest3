@@ -1,6 +1,4 @@
-referera klasstest3
-
-struktur jörgen
+struktur greta
 	def foo(x=0 y=0)
 		begär kalle
 			kalle+1
