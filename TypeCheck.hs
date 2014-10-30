@@ -16,13 +16,18 @@ doTypecheck ex = typecheck ex Data.Map.empty Data.Map.empty "" ""
 typecheck :: [Expr] -> FunctionsMap -> VariablesMap -> String -> String -> (FunctionsMap, VariablesMap, [String])
 typecheck [] funcenv env trace curclass = (funcenv, env, [])
 typecheck ((Klass name expr):ast) funcenv env trace curclass =
-    typecheck (expr ++ ast) funcenv env (trace ++ (if trace == "" then "" else "§") ++ name) curclass
-typecheck ((Function t name params stmts):ast) funcenv env  trace curclass=
-    typecheck (params ++ stmts ++ ast) newfuncenv env (newtrace) curclass
+    (nf2, env, nl1 ++ nl2)
     where
-        newtrace = (trace ++ if trace == "" then "" else "§" ++ name)
+        (nf1, ne1, nl1) = typecheck (expr) funcenv env (newtrace) curclass
+        (nf2, ne2, nl2) = typecheck (ast) funcenv env trace curclass
+        newtrace = (trace ++ (if trace == "" then "" else "§") ++ name)
+typecheck ((Function t name params stmts):ast) funcenv env trace curclass =
+    (nf2, env, nl1 ++ nl2)
+    where
+        (nf1, ne1, nl1) = typecheck (params ++ stmts) newfuncenv env (newtrace) curclass
+        (nf2, ne2, nl2) = typecheck (ast) newfuncenv env trace curclass
+        newtrace = (trace ++ (if trace == "" then "" else "§") ++ name)
         newfuncenv = Data.Map.insert name t funcenv
-    -- checka även params mot typer
 typecheck ((Var name):ast) funcenv env trace curclass = typecheck (ast) funcenv env trace curclass
 typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
     (newfuncenv2, env, (x):(log ++ log2))
