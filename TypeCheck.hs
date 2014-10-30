@@ -30,13 +30,16 @@ typecheck ((Function t name params stmts):ast) funcenv env trace curclass =
         newfuncenv = Data.Map.insert name t funcenv
 typecheck ((Var name):ast) funcenv env trace curclass = typecheck (ast) funcenv env trace curclass
 typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
-    (newfuncenv2, env, (x):(log ++ log2))
+    (newfuncenv2, env, if x == "" then (log ++ log2) else ((x):(log ++ log2)))
     where
         (newfuncenv2, newenv3, log2) = (typecheck ast newfuncenv newenv2 trace curclass)
         (newfuncenv, newenv2, log) = (typecheck (left:(right:[])) funcenv newenv trace curclass)
         (x, newenv) = case (name) of
             "=" -> case (left, right) of
-                ((Var name),t) -> ("= OK " ++ name, Data.Map.insert name (typetostring t funcenv env) env)
+                ((Var name),t) ->
+                    case (Dictionary.lookupinsert name (typetostring t funcenv env) env) of
+                        Just n -> ("= OK " ++ name, n)
+                        Nothing -> ("= ERROR Types not matching", env)
                 otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ")", env)
             "+" -> case (left, right) of
                 (t,t2) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
