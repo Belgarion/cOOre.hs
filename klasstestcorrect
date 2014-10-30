@@ -1,0 +1,12 @@
+struktur foo
+	barfoo = 2
+	barfoofoo = ""
+	barfoofoofoo = 2.3
+	def bar(x = 0 y = "" )
+		kalle = 1
+	klar
+
+	hel foo(x = 0 y = "")
+		return x
+	klar 
+meep

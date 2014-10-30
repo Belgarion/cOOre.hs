@@ -17,7 +17,7 @@ printClass x = x ++ "§"
 
 printAst :: [Expr] -> Int-> String
 printAst [] _ = ""
-printAst((Klass name expr):ast) depth = (ind depth) ++ "struktur " ++ name ++ "\n" ++ (printAst expr (depth+1)) ++ "meep\n\n" ++ (printAst ast depth)
+printAst((Klass name expr):ast) depth = (ind depth) ++ "struktur " ++ name ++ "\n" ++ (join "\n" ([printAst [i] (depth+1) | i <- expr])) ++ "meep\n\n" ++ (printAst ast depth)
 printAst((Function t name params stmts):ast) depth = (ind depth) ++ t ++ " " ++ name ++ "(" ++ (printAst params 0) ++ ")\n" ++ (join "\n" ([printAst [i] (depth+1) | i <- stmts])) ++ (ind depth) ++ "klar\n\n" ++ (printAst ast depth)
 printAst((Var name):ast) depth = (ind depth) ++ name ++ " " ++ (printAst ast depth)
 printAst((BinaryOp name left right):ast) depth = (ind depth) ++ (printAst [left] 0) ++ " " ++ name ++ " " ++ (printAst [right] 0) ++ " " ++  (printAst ast depth)

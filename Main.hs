@@ -14,6 +14,8 @@ import System.Console.Haskeline
 import TypeCheck
 import PrettyPrinting
 
+import CodeGen
+
 import Data.Map
 
 process :: String -> IO ()
@@ -53,4 +55,7 @@ main = do
             Right ex -> do
                 let (funcenv, varenv, log) = doTypecheck ex
                 putStrLn $ join "\n" log
+        case ast of
+              Left err -> print ""
+              Right ex -> putStrLn (codeGen ex "" 0)
         return ()
