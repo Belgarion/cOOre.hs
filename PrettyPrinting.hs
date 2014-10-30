@@ -4,6 +4,7 @@ import Syntax
 
 join :: String -> [String] -> String
 join _ [] = ""
+join delim (x:[]) = x
 join delim (x:xs) = x ++ delim ++ (join delim xs)
 
 ind :: Int -> String

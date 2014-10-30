@@ -8,5 +8,5 @@ struktur foo
 
 	hel foo(x = 0 y = "")
 		return x
-	klar 
+	klar
 meep
