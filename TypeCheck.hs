@@ -38,26 +38,26 @@ typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
             "=" -> case (left, right) of
                 ((Var name),t) ->
                     case (Dictionary.lookupinsert name (typetostring t funcenv env) env) of
-                        Just n -> ("= OK " ++ name, n)
-                        Nothing -> ("= ERROR Types not matching", env)
-                otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ")", env)
+                        Just n -> ("", n)
+                        Nothing -> ("= ERROR Types not matching near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
+                otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ") near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
             "+" -> case (left, right) of
-                (t,t2) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
+                (t,t2) -> if ts==ts2 then ("", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
                     ts = typetostring t funcenv env
                     ts2 = typetostring t2 funcenv env
             "-" -> case (left, right) of
-                (t,t2) -> if ts==ts2 then ("- OK", env) else ("- ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ show(BinaryOp name left right), env)
+                (t,t2) -> if ts==ts2 then ("", env) else ("- ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
                     ts = typetostring t funcenv env
                     ts2 = typetostring t2 funcenv env
             "*" -> case (left, right) of
-                (t,t2) -> if ts==ts2 then ("* OK", env) else ("* ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ show(BinaryOp name left right), env)
+                (t,t2) -> if ts==ts2 then ("", env) else ("* ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
                     ts = typetostring t funcenv env
                     ts2 = typetostring t2 funcenv env
             "/" -> case (left, right) of
-                (t,t2) -> if ts==ts2 then ("/ OK", env) else ("/ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ show(BinaryOp name left right), env)
+                (t,t2) -> if ts==ts2 then ("", env) else ("/ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
                     ts = typetostring t funcenv env
                     ts2 = typetostring t2 funcenv env
