@@ -77,7 +77,8 @@ codeGen ((Return value):ast) klass depth =
     (codeGen ast klass depth)
 codeGen ((Call cklass name params):ast) klass depth =
     (ind depth) ++ cklass ++ "_" ++ name ++ "(" ++
-    (join ", " [codeGen [x] klass 0 | x <- params]) ++ ");\n" ++
+    (join ", " [codeGen [x] klass 0 | x <- params]) ++ ")" ++
+    (if depth == 0 then "" else ";\n")  ++
     (codeGen ast klass depth)
 codeGen (expr:ast) klass depth =
     (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (codeGen ast klass (depth+1))
