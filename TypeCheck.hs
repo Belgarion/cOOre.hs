@@ -16,21 +16,30 @@ doTypecheck ex = typecheck ex Data.Map.empty Data.Map.empty "" ""
 typecheck :: [Expr] -> FunctionsMap -> VariablesMap -> String -> String -> (FunctionsMap, VariablesMap, [String])
 typecheck [] funcenv env trace curclass = (funcenv, env, [])
 typecheck ((Klass name expr):ast) funcenv env trace curclass =
-    typecheck (expr ++ ast) funcenv env (trace ++ (if trace == "" then "" else "§") ++ name) curclass
-typecheck ((Function t name params stmts):ast) funcenv env  trace curclass=
-    typecheck (params ++ stmts ++ ast) newfuncenv env trace curclass
+    (nf2, env, nl1 ++ nl2)
     where
+        (nf1, ne1, nl1) = typecheck (expr) funcenv env (newtrace) curclass
+        (nf2, ne2, nl2) = typecheck (ast) funcenv env trace curclass
+        newtrace = (trace ++ (if trace == "" then "" else "§") ++ name)
+typecheck ((Function t name params stmts):ast) funcenv env trace curclass =
+    (nf2, env, nl1 ++ nl2)
+    where
+        (nf1, ne1, nl1) = typecheck (params ++ stmts) newfuncenv env (newtrace) curclass
+        (nf2, ne2, nl2) = typecheck (ast) newfuncenv env trace curclass
+        newtrace = (trace ++ (if trace == "" then "" else "§") ++ name)
         newfuncenv = Data.Map.insert name t funcenv
-    -- checka även params mot typer
 typecheck ((Var name):ast) funcenv env trace curclass = typecheck (ast) funcenv env trace curclass
 typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
-    (newfuncenv2, env, (x):(log ++ log2))
+    (newfuncenv2, env, if x == "" then (log ++ log2) else ((x):(log ++ log2)))
     where
         (newfuncenv2, newenv3, log2) = (typecheck ast newfuncenv newenv2 trace curclass)
         (newfuncenv, newenv2, log) = (typecheck (left:(right:[])) funcenv newenv trace curclass)
         (x, newenv) = case (name) of
             "=" -> case (left, right) of
-                ((Var name),t) -> ("= OK " ++ name, Data.Map.insert name (typetostring t funcenv env) env)
+                ((Var name),t) ->
+                    case (Dictionary.lookupinsert name (typetostring t funcenv env) env) of
+                        Just n -> ("= OK " ++ name, n)
+                        Nothing -> ("= ERROR Types not matching", env)
                 otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ")", env)
             "+" -> case (left, right) of
                 (t,t2) -> if ts==ts2 then ("+ OK", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
@@ -64,10 +73,11 @@ typecheck ((Void):ast) funcenv env trace curclass = typecheck ast funcenv env tr
 typecheck ((Return expr):ast) funcenv env trace curclass = typecheck (expr:ast) funcenv env trace curclass
 typecheck ((Claim name stmts):ast) funcenv env trace curclass = typecheck (stmts ++ ast) funcenv env trace curclass
 typecheck ((Include filename stmts):ast) funcenv env trace curclass = typecheck (stmts ++ ast) funcenv env trace curclass
+typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass = typecheck (defs ++ ast) funcenv env trace curclass
 typecheck (expr:ast) funcenv env trace curclass =
     (newfuncenv, env, ("Other " ++ (show expr)):log)
     where
-        (newfuncenv, newenv, log) = (typecheck ast newfuncenv env trace curclass)
+        (newfuncenv, newenv, log) = (typecheck ast funcenv env trace curclass)
 
 typetostring :: Expr -> FunctionsMap -> VariablesMap-> String
 typetostring (String _) _ _ = "sträng"

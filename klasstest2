@@ -1,7 +1,7 @@
 referera klasstest3
 
 struktur jörgen
-	def foo(x=0 y=0)
+	def fooj(x=0 y=0)
 		begär kalle
 			kalle+1
 		klar
