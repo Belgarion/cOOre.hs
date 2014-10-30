@@ -20,6 +20,7 @@ data Expr
   | UnaryOp Name Expr
   | Klass Name [Expr]
   | Include Name [Expr]
+  | IncludeCore Name [Expr]
   | If Expr [Expr] [Expr]
   | For Expr Expr Expr [Expr]
   | Async Expr Expr Expr

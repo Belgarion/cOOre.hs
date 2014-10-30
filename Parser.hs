@@ -193,7 +193,7 @@ contents p = do
 
 toplevel :: Parser [Expr]
 toplevel = many $ do
-    def <- klass <|> include
+    def <- klass <|> include <|> includecore
     return def
 
 klass :: Parser Expr
@@ -212,6 +212,14 @@ include = do
     case ast of
       Left _ -> return $ Include name []
       Right x -> return $ Include name x
+
+includecore :: Parser Expr
+includecore = do 
+  reserved "refereracore"
+  file <- identifier
+  stmts <- many defn
+  reserved "meep"
+  return $ IncludeCore file stmts
 
 parseExpr :: String -> Either ParseError Expr
 parseExpr s = parse (contents expr) "<stdin>" s

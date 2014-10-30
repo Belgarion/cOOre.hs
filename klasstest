@@ -1,5 +1,12 @@
 referera klasstest2
 
+refereracore corefile 
+	def foo(a = 1)
+	klar
+	def bar(b = "")
+	klar
+meep
+
 struktur hej
 	def foo(x="" y=1)
 		kalle+1
@@ -14,6 +21,7 @@ struktur hej
 
 	def foo2(x=0 y=0)
 		x+hej§foo2(y 4.0)
+		foo("foo" 5)
 		om 4=3
 			v = 6
 		annars
