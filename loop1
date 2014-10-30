@@ -1,0 +1,9 @@
+referera loop2
+struktur jörgen
+	def foo(x=0 y=0)
+		begär kalle
+			kalle+1
+		klar
+		återvänd
+	klar
+meep
