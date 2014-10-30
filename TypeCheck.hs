@@ -18,8 +18,9 @@ typecheck [] funcenv env trace curclass = (funcenv, env, [])
 typecheck ((Klass name expr):ast) funcenv env trace curclass =
     typecheck (expr ++ ast) funcenv env (trace ++ (if trace == "" then "" else "§") ++ name) curclass
 typecheck ((Function t name params stmts):ast) funcenv env  trace curclass=
-    typecheck (params ++ stmts ++ ast) newfuncenv env trace curclass
+    typecheck (params ++ stmts ++ ast) newfuncenv env (newtrace) curclass
     where
+        newtrace = (trace ++ if trace == "" then "" else "§" ++ name)
         newfuncenv = Data.Map.insert name t funcenv
     -- checka även params mot typer
 typecheck ((Var name):ast) funcenv env trace curclass = typecheck (ast) funcenv env trace curclass
@@ -64,10 +65,11 @@ typecheck ((Void):ast) funcenv env trace curclass = typecheck ast funcenv env tr
 typecheck ((Return expr):ast) funcenv env trace curclass = typecheck (expr:ast) funcenv env trace curclass
 typecheck ((Claim name stmts):ast) funcenv env trace curclass = typecheck (stmts ++ ast) funcenv env trace curclass
 typecheck ((Include filename stmts):ast) funcenv env trace curclass = typecheck (stmts ++ ast) funcenv env trace curclass
+typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass = typecheck (defs ++ ast) funcenv env trace curclass
 typecheck (expr:ast) funcenv env trace curclass =
     (newfuncenv, env, ("Other " ++ (show expr)):log)
     where
-        (newfuncenv, newenv, log) = (typecheck ast newfuncenv env trace curclass)
+        (newfuncenv, newenv, log) = (typecheck ast funcenv env trace curclass)
 
 typetostring :: Expr -> FunctionsMap -> VariablesMap-> String
 typetostring (String _) _ _ = "sträng"

@@ -1,6 +1,6 @@
 referera klasstest2
 
-refereracore corefile 
+refereracore corefile
 	def foo(a = 1)
 	klar
 	def bar(b = "")
