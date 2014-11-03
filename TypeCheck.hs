@@ -62,18 +62,35 @@ typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
                     ts = typetostring t funcenv env
                     ts2 = typetostring t2 funcenv env
             otherwise -> ("Unhandled binaryop " ++ name, env)
-typecheck ((Call _ name params):ast) funcenv env trace curclass = typecheck (params ++ ast) funcenv env trace curclass
-typecheck ((Float value):ast) funcenv env trace curclass = typecheck (ast) funcenv env trace curclass
-typecheck ((Int value):ast) funcenv env trace curclass = typecheck (ast) funcenv env trace curclass
-typecheck ((Async after before stmt):ast) funcenv env trace curclass = typecheck (stmt:ast) funcenv env trace curclass
-typecheck ((If cond true false):ast) funcenv env trace curclass = typecheck (cond:(true ++ false ++ ast)) funcenv env trace curclass
-typecheck ((For init cond after stmts):ast) funcenv env trace curclass = typecheck (init:(cond:(after:(stmts++ast)))) funcenv env trace curclass
-typecheck ((String string):ast) funcenv env trace curclass = typecheck ast funcenv env trace curclass
-typecheck ((Void):ast) funcenv env trace curclass = typecheck ast funcenv env trace curclass
-typecheck ((Return expr):ast) funcenv env trace curclass = typecheck (expr:ast) funcenv env trace curclass
-typecheck ((Claim name stmts):ast) funcenv env trace curclass = typecheck (stmts ++ ast) funcenv env trace curclass
-typecheck ((Include filename stmts):ast) funcenv env trace curclass = typecheck (stmts ++ ast) funcenv env trace curclass
-typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass = typecheck (defs ++ ast) funcenv env trace curclass
+typecheck ((Call klass name params):ast) funcenv env trace curclass =
+    (funcenv, env, if error == "" then log else (error:log))
+    where
+        (_, _, log) = typecheck (params ++ ast) funcenv env trace curclass
+        error = case (Data.Map.lookup name funcenv) of
+            Nothing -> "Undeclared function " ++ name
+            Just s -> ""
+typecheck ((Float value):ast) funcenv env trace curclass =
+    typecheck (ast) funcenv env trace curclass
+typecheck ((Int value):ast) funcenv env trace curclass =
+    typecheck (ast) funcenv env trace curclass
+typecheck ((Async after before stmt):ast) funcenv env trace curclass =
+    typecheck (stmt:ast) funcenv env trace curclass
+typecheck ((If cond true false):ast) funcenv env trace curclass =
+    typecheck (cond:(true ++ false ++ ast)) funcenv env trace curclass
+typecheck ((For init cond after stmts):ast) funcenv env trace curclass =
+    typecheck (init:(cond:(after:(stmts++ast)))) funcenv env trace curclass
+typecheck ((String string):ast) funcenv env trace curclass =
+    typecheck ast funcenv env trace curclass
+typecheck ((Void):ast) funcenv env trace curclass =
+    typecheck ast funcenv env trace curclass
+typecheck ((Return expr):ast) funcenv env trace curclass =
+    typecheck (expr:ast) funcenv env trace curclass
+typecheck ((Claim name stmts):ast) funcenv env trace curclass =
+    typecheck (stmts ++ ast) funcenv env trace curclass
+typecheck ((Include filename stmts):ast) funcenv env trace curclass =
+    typecheck (stmts ++ ast) funcenv env trace curclass
+typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass =
+    typecheck (defs ++ ast) funcenv env trace curclass
 typecheck (expr:ast) funcenv env trace curclass =
     (newfuncenv, env, ("Other " ++ (show expr)):log)
     where

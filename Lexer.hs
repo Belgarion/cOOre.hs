@@ -2,7 +2,8 @@ module Lexer where
 
 import Text.Parsec.String (Parser)
 import Text.Parsec.Language (emptyDef)
-import Text.Parsec.Prim (many)
+import Text.Parsec.Prim (many, (<|>))
+import Text.Parsec(alphaNum, oneOf)
 
 import qualified Text.Parsec.Token as Tok
 
@@ -13,8 +14,13 @@ lexer = Tok.makeTokenParser style
     names = ["def","extern","binary", "unary", "meep", "klar", "om", "annars", "för", "async", "efter", "före", "hel","flyt","sträng","återvänd","begär", "referera","refereracore"]
     style = emptyDef {
                Tok.commentLine = "°"
+             , Tok.commentStart = "*°"
+             , Tok.commentEnd = "°*"
+             , Tok.nestedComments = True
              , Tok.reservedOpNames = ops
              , Tok.reservedNames = names
+             --, Tok.identLetter = alphaNum <|> oneOf ";&{}\\_"
+             --, Tok.identStart = alphaNum <|> oneOf ";&{}\\_"
              }
 
 integer :: Parser Integer
