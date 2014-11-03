@@ -19,6 +19,9 @@ struktur foo
          kalle = 5
          kalle+2
         klar
+        för iass=0 largerThan(iass 4) iass=iass+1
+            bar(iass "hej")
+        klar
 		återvänd x
 	klar
 meep

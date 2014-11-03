@@ -84,6 +84,7 @@ typecheck ((Int value):ast) funcenv env trace curclass =
     typecheck (ast) funcenv env trace curclass
 typecheck ((Async after before stmt):ast) funcenv env trace curclass =
     typecheck (stmt:ast) funcenv env trace curclass
+
 typecheck ((If cond true false):ast) funcenv env trace curclass =
     (((env, (IfF cond asttrue astfalse)):fast), funcenv, env, (nlcond ++ nltrue ++ nlfalse ++ nlast))
     where
@@ -91,8 +92,17 @@ typecheck ((If cond true false):ast) funcenv env trace curclass =
         (asttrue, nftrue, netrue, nltrue) = typecheck true funcenv env trace curclass
         (astfalse, nffalse, nefalse, nlfalse) = typecheck false funcenv env trace curclass
         (fast, nfast, neast, nlast) = typecheck ast funcenv env trace curclass
+
 typecheck ((For init cond after stmts):ast) funcenv env trace curclass =
-    typecheck (init:(cond:(after:(stmts++ast)))) funcenv env trace curclass
+    (((env,(ForF init cond after fstmts)):fast), funcenv, env, (inerr++coerr++aferr++sterr++nasterr))
+    where
+        (_,_,ienv,inerr) = typecheck [init] funcenv env trace curclass
+        (_,_,_,coerr) = typecheck [cond] funcenv ienv trace curclass
+        (_,_,_,aferr) = typecheck [after] funcenv ienv trace curclass
+        (fstmts, _, _, sterr) = typecheck stmts funcenv ienv trace curclass
+        (fast, _, _, nasterr) = typecheck ast funcenv env trace curclass
+    --typecheck (init:(cond:(after:(stmts++ast)))) funcenv env trace curclass
+
 typecheck ((String string):ast) funcenv env trace curclass =
     typecheck ast funcenv env trace curclass
 typecheck ((Void):ast) funcenv env trace curclass =

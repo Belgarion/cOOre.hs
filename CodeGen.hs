@@ -73,6 +73,9 @@ fancyGenStruct name stmts = "struct struct_" ++ name ++
     (fancyCodeGen [x|x <- stmts, isAss' x] name 0) ++
     "}\n"
 
+forInitHelp :: Expr -> String -> Int -> String
+forInitHelp expr klass depth = if (isAss expr) then (genTypDef [expr]) else (codeGen [expr] klass depth)
+
 --			ast    klassnamn    indent  code
 codeGen :: [Expr] -> String -> Int -> String
 codeGen [] _ _ = ""
@@ -148,6 +151,13 @@ fancyCodeGen ((env, (IfF cond th el)):ast) klass depth =
     (genTypDef' [x | (env, x) <- el, isAss' (env, x), not (inEnv env x)]) ++
     (join "\n" [fancyCodeGen [x] klass (depth+1)| x <- el]) ++
     (ind depth) ++ "}\n" ++
+    (fancyCodeGen ast klass depth)
+fancyCodeGen ((env,(ForF init cond after fstmts)):ast) klass depth =
+	(ind depth) ++ "for (" ++ (forInitHelp init klass 0) ++ ";" ++ 
+	(codeGen [cond] klass 0) ++ ";" ++ (codeGen [after] klass 0) ++ "){\n" ++
+	(genTypDef' [x | (env, x) <- fstmts, isAss' (env, x), not (inEnv env x)]) ++
+	(join "\n" [fancyCodeGen [x] klass (depth+1) | x <- fstmts]) ++ "\n" ++ (ind depth) ++
+	(ind depth) ++ "}\n" ++
     (fancyCodeGen ast klass depth)
 fancyCodeGen ((env, (ReturnF value)):ast) klass depth =
     (ind depth) ++ "return " ++ (codeGen [value] klass 0) ++ ";\n" ++

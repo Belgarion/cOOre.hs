@@ -32,7 +32,7 @@ op = do
   whitespace
   return o
 
-binops = [[binary "=" Ex.AssocLeft]
+binops = [[binary "=" Ex.AssocNone]
          ,[binary "*" Ex.AssocLeft,
            binary "/" Ex.AssocLeft]
          ,[binary "+" Ex.AssocLeft,
