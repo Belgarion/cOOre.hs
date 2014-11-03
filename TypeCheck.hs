@@ -76,8 +76,13 @@ typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
                     ts2 = typetostring t2 funcenv env
             otherwise -> ("Unhandled binaryop " ++ name, env)
 typecheck ((Call klass name params):ast) funcenv env trace curclass =
-    ((env, (CallF klass name past)):fast, funcenv, env, if error == "" then log else (error:log))
+    ((env, (CallF cklass name past)):fast, funcenv, env, if error == "" then log else (error:log))
     where
+        cklass = case (Data.Map.lookup name funcenv) of
+            Nothing -> case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
+                Nothing -> ""
+                Just s -> klass
+            Just s -> ""
         log = plog ++ flog
         (fast, _, _, flog) = typecheck (ast) funcenv env trace curclass
         (past, _, _, plog) = typecheck (params) funcenv env trace curclass

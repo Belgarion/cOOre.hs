@@ -84,7 +84,7 @@ fancyGenStruct name stmts = "struct struct_" ++ name ++
     " {\n" ++ (genTypDef' [x|(env, x) <- stmts, isAss' (env, x)]) ++ "};\n" ++
     "struct struct_" ++ name ++ " " ++ name ++ ";\n" ++
     "void init_" ++ name ++ "() {\n" ++
-    (fancyCodeGen Data.Map.empty [x|x <- stmts, isAss' x] name 1) ++
+    (fancyCodeGen Data.Map.empty [x|x <- stmts, isAss' x] name (-1)) ++
     "}\n"
 
 forInitHelp :: VariablesMap -> FancyASTEntry -> String -> Int -> String
@@ -139,7 +139,7 @@ fancyCodeGen funcenv [] _ _ = ""
 fancyCodeGen funcenv ((env, (KlassF name stmts)):ast) _ depth =
     (ind depth) ++ fancyGenStruct name stmts ++ (fancyCodeGen funcenv [x | x <- stmts, not (isAss' x)] name depth) ++ "\n" ++ (fancyCodeGen funcenv ast "" depth)
 fancyCodeGen funcenv ((env, (BinaryOpF name left right)):ast) klass depth =
-    (ind depth) ++ (fancyCodeGen funcenv [left] klass 0) ++ name ++ " " ++
+    (ind depth) ++ (fancyCodeGen funcenv [left] klass (if depth < 0 then depth else 0)) ++ name ++ " " ++
     (fancyCodeGen funcenv [right] klass 0) ++ (if depth == 0 then "" else ";\n") ++
     (fancyCodeGen funcenv ast klass (depth))
 fancyCodeGen funcenv ((env, (FunctionF t name params stmts)):ast) klass depth =
@@ -150,7 +150,7 @@ fancyCodeGen funcenv ((env, (FunctionF t name params stmts)):ast) klass depth =
     (fancyCodeGen funcenv stmts klass (depth+1)) ++ "\n}\n" ++
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (VarF name)):ast) klass depth =
-    (ind depth) ++ path ++ name ++ " " ++ (fancyCodeGen funcenv ast klass depth)
+    (ind depth) ++ (if (depth == -1) then (klass ++ ".") else path) ++ name ++ " " ++ (fancyCodeGen funcenv ast klass depth)
     where
         path = case (Data.Map.lookup (klass ++ "." ++ name) env) of
             Just x -> klass ++ "."
@@ -182,7 +182,7 @@ fancyCodeGen funcenv ((env, (ReturnF value)):ast) klass depth =
     (ind depth) ++ "return " ++ (fancyCodeGen funcenv [value] klass 0) ++ ";\n" ++
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (CallF cklass name params)):ast) klass depth =
-    (ind depth) ++ cklass ++ "_" ++ name ++ "(" ++
+    (ind depth) ++ (if cklass == "" then "" else (cklass ++ "_")) ++ name ++ "(" ++
     (join ", " [fancyCodeGen funcenv [x] klass 0 | x <- params]) ++ ")" ++
     (if depth == 0 then "" else ";\n")  ++
     (fancyCodeGen funcenv ast klass depth)

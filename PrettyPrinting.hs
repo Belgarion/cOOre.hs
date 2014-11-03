@@ -9,7 +9,7 @@ join delim (x:xs) = x ++ delim ++ (join delim xs)
 
 ind :: Int -> String
 ind 0 = ""
-ind x = (ind (x-1)) ++ "  "
+ind x = if (x < 0) then "" else ((ind (x-1)) ++ "  ")
 
 printClass :: String -> String
 printClass "" = ""
