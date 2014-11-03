@@ -31,25 +31,26 @@ data Expr
 type FunctionsMap = Data.Map.Map String String
 type VariablesMap = Data.Map.Map String String
 type FancyAST = [(VariablesMap, FancyExpr)]
+type FancyASTEntry = (VariablesMap, FancyExpr)
 data FancyExpr -- for FancyAst
   = FloatF Double
   | IntF Integer
   | StringF String
   | VoidF
   | VarF String
-  | CallF Name Name [Expr]
+  | CallF Name Name FancyAST
   | FunctionF Type Name [Expr] FancyAST
   | ReturnF Expr
   | ClaimF Name FancyAST
   | ExternF Name FancyAST
   | BinaryDefF Name [Name] FancyExpr
   | UnaryDefF Name [Name] FancyExpr
-  | BinaryOpF Name Expr Expr
+  | BinaryOpF Name FancyASTEntry FancyASTEntry
   | UnaryOpF Name FancyExpr
   | KlassF Name FancyAST
   | IncludeF Name FancyAST
   | IncludeCoreF Name FancyAST
   | IfF Expr FancyAST FancyAST
-  | ForF Expr Expr Expr FancyAST
+  | ForF FancyASTEntry FancyASTEntry FancyASTEntry FancyAST
   | AsyncF FancyExpr FancyExpr FancyExpr
   deriving (Eq, Ord, Show)

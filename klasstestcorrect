@@ -17,7 +17,7 @@ struktur foo
         °*
         om largerThan(1 2)
          kalle = 5
-         kalle+2
+         (10+10)*10
         klar
         för iass=0 largerThan(iass 4) iass=iass+1
             bar(iass "hej")

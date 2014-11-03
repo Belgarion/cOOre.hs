@@ -12,6 +12,9 @@ import Debug.Trace
 
 --type FancyAST = [(VariablesMap, FancyExpr)]
 
+firstFExpr (fast:_) = fast
+firstFExpr [] = (Data.Map.empty, StringF "fail")
+
 doTypecheck :: [Expr] -> (FancyAST, FunctionsMap, VariablesMap, [String])
 doTypecheck ex = typecheck ex Data.Map.empty Data.Map.empty "" ""
 
@@ -36,10 +39,11 @@ typecheck ((Var name):ast) funcenv env trace curclass =
     where
       (fast, nf, ne, nl) = typecheck (ast) funcenv env trace curclass
 typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
-    ((env, (BinaryOpF name left right)):fast, newfuncenv2, env, if x == "" then (log ++ log2) else ((x):(log ++ log2)))
+    ((env, (BinaryOpF name (firstFExpr last) (firstFExpr rast) )):fast, newfuncenv2, env, (if x == "" then "" else x):(logl ++ logr ++ log2))
     where
-        (fast, newfuncenv2, newenv3, log2) = (typecheck ast newfuncenv newenv2 trace curclass)
-        (last_rast, newfuncenv, newenv2, log) = (typecheck (left:(right:[])) funcenv newenv trace curclass)
+        (fast, newfuncenv2, newenv3, log2) = (typecheck ast newfuncenvv newenvv2 trace curclass)
+        (rast, newfuncenvv, newenvv2, logr) = (typecheck ([right]) newfuncenv newenv2 trace curclass)
+        (last, newfuncenv, newenv2, logl) = (typecheck ([left]) funcenv newenv trace curclass)
         (x, newenv) = case (name) of
             "=" -> case (left, right) of
                 ((Var name),t) ->
@@ -72,18 +76,24 @@ typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
                     ts2 = typetostring t2 funcenv env
             otherwise -> ("Unhandled binaryop " ++ name, env)
 typecheck ((Call klass name params):ast) funcenv env trace curclass =
-    ((env, (CallF klass name params)):fast, funcenv, env, if error == "" then log else (error:log))
+    ((env, (CallF klass name past)):fast, funcenv, env, if error == "" then log else (error:log))
     where
-        (fast, _, _, log) = typecheck (params ++ ast) funcenv env trace curclass
+        log = plog ++ flog
+        (fast, _, _, flog) = typecheck (ast) funcenv env trace curclass
+        (past, _, _, plog) = typecheck (params) funcenv env trace curclass
         error = case (Data.Map.lookup name funcenv) of
             Nothing -> "Undeclared function " ++ name
             Just s -> ""
 typecheck ((Float value):ast) funcenv env trace curclass =
-    typecheck (ast) funcenv env trace curclass
+    ((env, (FloatF value)):fast, funcenv, env, log)
+    where
+        (fast, _, _, log) = typecheck (ast) funcenv env trace curclass
 typecheck ((Int value):ast) funcenv env trace curclass =
-    typecheck (ast) funcenv env trace curclass
+    ((env, (IntF value)):fast, funcenv, env, log)
+    where
+        (fast, _, _, log) = typecheck (ast) funcenv env trace curclass
 typecheck ((Async after before stmt):ast) funcenv env trace curclass =
-    typecheck (stmt:ast) funcenv env trace curclass
+    typecheck (stmt:ast) funcenv env trace curclass --TODO
 
 typecheck ((If cond true false):ast) funcenv env trace curclass =
     (((env, (IfF cond asttrue astfalse)):fast), funcenv, env, (nlcond ++ nltrue ++ nlfalse ++ nlast))
@@ -94,30 +104,33 @@ typecheck ((If cond true false):ast) funcenv env trace curclass =
         (fast, nfast, neast, nlast) = typecheck ast funcenv env trace curclass
 
 typecheck ((For init cond after stmts):ast) funcenv env trace curclass =
-    (((env,(ForF init cond after fstmts)):fast), funcenv, env, (inerr++coerr++aferr++sterr++nasterr))
+    (((env,(ForF (firstFExpr iast) (firstFExpr cast) (firstFExpr aast) fstmts)):fast), funcenv, env, (inerr++coerr++aferr++sterr++nasterr))
     where
-        (_,_,ienv,inerr) = typecheck [init] funcenv env trace curclass
-        (_,_,_,coerr) = typecheck [cond] funcenv ienv trace curclass
-        (_,_,_,aferr) = typecheck [after] funcenv ienv trace curclass
+        (iast,_,ienv,inerr) = typecheck [init] funcenv env trace curclass
+        (cast,_,_,coerr) = typecheck [cond] funcenv ienv trace curclass
+        (aast,_,_,aferr) = typecheck [after] funcenv ienv trace curclass
         (fstmts, _, _, sterr) = typecheck stmts funcenv ienv trace curclass
         (fast, _, _, nasterr) = typecheck ast funcenv env trace curclass
-    --typecheck (init:(cond:(after:(stmts++ast)))) funcenv env trace curclass
 
 typecheck ((String string):ast) funcenv env trace curclass =
-    typecheck ast funcenv env trace curclass
+    ((env, (StringF string)):fast, funcenv, env, log)
+    where
+        (fast, _, _, log) = typecheck (ast) funcenv env trace curclass
 typecheck ((Void):ast) funcenv env trace curclass =
-    typecheck ast funcenv env trace curclass
+    ((env, (VoidF)):fast, funcenv, env, log)
+    where
+        (fast, _, _, log) = typecheck (ast) funcenv env trace curclass
 typecheck ((Return expr):ast) funcenv env trace curclass =
     ((env, (ReturnF expr)):fast, funcenv, env, nlexpr ++ nlast)
     where
         (exprast, nfexpr, neexpr, nlexpr) = typecheck [expr] funcenv env trace curclass
         (fast, nfast, neast, nlast) = typecheck ast funcenv env trace curclass
 typecheck ((Claim name stmts):ast) funcenv env trace curclass =
-    typecheck (stmts ++ ast) funcenv env trace curclass
+    typecheck (stmts ++ ast) funcenv env trace curclass --TODO
 typecheck ((Include filename stmts):ast) funcenv env trace curclass =
-    typecheck (stmts ++ ast) funcenv env trace curclass
+    typecheck (stmts ++ ast) funcenv env trace curclass -- TODO
 typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass =
-    typecheck (defs ++ ast) funcenv env trace curclass
+    typecheck (defs ++ ast) funcenv env trace curclass -- TODO
 typecheck (expr:ast) funcenv env trace curclass =
     (fast, newfuncenv, env, ("Other " ++ (show expr)):log)
     where

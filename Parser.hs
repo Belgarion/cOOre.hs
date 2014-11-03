@@ -32,12 +32,12 @@ op = do
   whitespace
   return o
 
-binops = [[binary "=" Ex.AssocNone]
-         ,[binary "*" Ex.AssocLeft,
+binops = [ [binary "*" Ex.AssocLeft,
            binary "/" Ex.AssocLeft]
          ,[binary "+" Ex.AssocLeft,
            binary "-" Ex.AssocLeft]
-         ,[binary "<" Ex.AssocLeft]]
+         ,[binary "<" Ex.AssocLeft],
+         [binary "=" Ex.AssocRight]]
 
 int :: Parser Expr
 int = do

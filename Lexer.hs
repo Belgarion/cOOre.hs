@@ -10,7 +10,7 @@ import qualified Text.Parsec.Token as Tok
 lexer :: Tok.TokenParser ()
 lexer = Tok.makeTokenParser style
   where
-    ops = ["+","*","-","§"]
+    ops = ["=", "+","*","-","§"]
     names = ["def","extern","binary", "unary", "meep", "klar", "om", "annars", "för", "async", "efter", "före", "hel","flyt","sträng","återvänd","begär", "referera","refereracore"]
     style = emptyDef {
                Tok.commentLine = "°"
