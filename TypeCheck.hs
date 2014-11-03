@@ -121,7 +121,7 @@ typecheck ((Void):ast) funcenv env trace curclass =
     where
         (fast, _, _, log) = typecheck (ast) funcenv env trace curclass
 typecheck ((Return expr):ast) funcenv env trace curclass =
-    ((env, (ReturnF expr)):fast, funcenv, env, nlexpr ++ nlast)
+    ((env, (ReturnF (firstFExpr exprast))):fast, funcenv, env, nlexpr ++ nlast)
     where
         (exprast, nfexpr, neexpr, nlexpr) = typecheck [expr] funcenv env trace curclass
         (fast, nfast, neast, nlast) = typecheck ast funcenv env trace curclass

@@ -40,7 +40,7 @@ data FancyExpr -- for FancyAst
   | VarF String
   | CallF Name Name FancyAST
   | FunctionF Type Name [Expr] FancyAST
-  | ReturnF Expr
+  | ReturnF FancyASTEntry
   | ClaimF Name FancyAST
   | ExternF Name FancyAST
   | BinaryDefF Name [Name] FancyExpr

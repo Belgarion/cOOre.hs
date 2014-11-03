@@ -179,7 +179,7 @@ fancyCodeGen funcenv ((env,(ForF init cond after fstmts)):ast) klass depth =
 	(ind depth) ++ "}\n" ++
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (ReturnF value)):ast) klass depth =
-    (ind depth) ++ "return " ++ (codeGen [value] klass 0) ++ ";\n" ++
+    (ind depth) ++ "return " ++ (fancyCodeGen funcenv [value] klass 0) ++ ";\n" ++
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (CallF cklass name params)):ast) klass depth =
     (ind depth) ++ cklass ++ "_" ++ name ++ "(" ++
