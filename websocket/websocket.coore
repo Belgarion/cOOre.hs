@@ -1,0 +1,123 @@
+referera std.coore
+
+refereracore websocket.core
+	ws_send(send_buff = "")  °256
+	klar
+meep
+
+
+
+°Task client_receive(char_p msg) {
+°	#> printf("client wrote : %s\n", msg); <#
+°}
+
+struktur client 
+	def recive(msg = "")
+		om isEqual(strcmp(msg "vinner"),0)
+			server§reset()
+		annars
+		klar
+	klar
+meep
+
+struktur server
+	endTime = 1000 
+	sendBuff = ""
+	sendTime = 1000
+	currentTime = 0
+
+	°need begär send
+	int compileJson()
+		temp1 = cat("{",sendBuff)
+		temp2 = cat(sendBuff,"}")
+		sendBuff = temp2
+		free(temp1)
+		return 1
+	klar
+
+
+	def sendData()
+		begär send
+			timeString = malloc(8*ilen(currentTime/1000))
+			itoa(currentTime/1000 timeString)
+			addJson("time" timeString)
+			complieJson()
+			sync ws_send(sendBuff)
+			currentTime = sendTime + currentTime
+			
+			free(send_buff)
+		klar
+		async after sendTime sendData
+	klar
+
+	°need begär send
+	int addJson(key = "" value = "")
+		temp1 = ""
+		om isEqual(0 strlen(sendBuff))
+			temp1 = cat("\"",key)
+		annars
+			temp1 = cat(",\"",key)
+		klar		
+
+		temp2 = cat(temp1,"\":\"")
+		temp3 = cat(temp2,value)
+		
+		temp4 = ""
+		om isEqual(0 strlen(sendBuff))
+			temp4 = cat(temp3, "\"")
+		annars
+			temp4 = cat(temp3,"\",")
+		klar
+		
+		free(temp1)
+		free(temp2)
+		free(temp3)
+		temp = cat(sendBuff,temp4)
+		free(sendBuff)
+		sendBuff = temp
+		free(temp4)
+		återvänd 1;
+	klar
+
+	int addJsonLocked(key = "" value = "") 
+		begär send
+			addJson(key value)
+		klar
+		återvänd 1;
+	klar
+
+	int setSendTime(time = 0)
+		sendTime = time
+		återvänd 1;
+	klar
+	
+	int reset()
+		endTime = 1000 
+		free(sendBuff)
+		sendTime = 1000
+		currentTime = 0
+	klar
+meep
+
+°Task periodic() {
+°	#>
+°	static char send_buff[256];
+°	static int i = 0;
+°	sprintf(send_buff, "Counter %d", i++);
+°	<#
+°	sync ws_send(send_buff);
+°	async after 2s periodic();
+°}
+
+
+
+
+Idle {
+	#> printf("User Idle\n"); <# 
+	async periodic();
+	sync idle_websocket(); 
+}
+
+
+
+

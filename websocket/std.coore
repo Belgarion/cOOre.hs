@@ -1,0 +1,22 @@
+refereracore std.core
+	sträng cat(leftstring="" rigthstring="")
+	klar
+	hel greaterThan(big=0 small=0)
+	klar
+	hel strlen(charPRT = "")
+	klar
+	hel isEqual(a = 0 b = 0)
+	klar
+	hel ilen(a = 0)
+	klar
+	sträng itoa(integer = 0 returnstring = "")
+	klar
+
+	°stolen from c libs
+	def free(charpointertofree="")
+	klar
+	sträng malloc(size = 0)
+	klar
+	int strcmp(a = "" b = "")
+	klar 
+meep

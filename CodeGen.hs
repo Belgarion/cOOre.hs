@@ -37,5 +37,3 @@ codeGen :: [Expr] -> String -> Int -> String
 codeGen [] _ _ = ""
 codeGen ((Klass name stmts):ast) _ depth = genStruct name stmts ++ (codeGen stmts name depth) ++ "\n" ++ (codeGen ast name depth) 
 codeGen (expr:ast) _ depth = (ind depth) ++ "other :: " ++ (show expr) ++ (codeGen ast "" depth)
-
-
