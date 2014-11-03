@@ -51,7 +51,8 @@ main = do
             Left err -> print ""
             Right ex -> do
                 putStrLn $ printAst ex 0
-                let (funcenv, varenv, log) = doTypecheck ex
+                let (fast, funcenv, varenv, log) = doTypecheck ex
                 putStrLn $ join "\n" log
-                putStrLn $ codeGen ex "" 0
+                putStrLn $ fancyCodeGen fast "" 0
+                putStrLn $ show fast
         return ()

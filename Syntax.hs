@@ -1,5 +1,7 @@
 module Syntax where
 
+import Data.Map
+
 type Name = String
 type Type = String
 
@@ -24,4 +26,30 @@ data Expr
   | If Expr [Expr] [Expr]
   | For Expr Expr Expr [Expr]
   | Async Expr Expr Expr
+  deriving (Eq, Ord, Show)
+
+type FunctionsMap = Data.Map.Map String String
+type VariablesMap = Data.Map.Map String String
+type FancyAST = [(VariablesMap, FancyExpr)]
+data FancyExpr -- for FancyAst
+  = FloatF Double
+  | IntF Integer
+  | StringF String
+  | VoidF
+  | VarF String
+  | CallF Name Name [Expr]
+  | FunctionF Type Name [Expr] FancyAST
+  | ReturnF Expr
+  | ClaimF Name FancyAST
+  | ExternF Name FancyAST
+  | BinaryDefF Name [Name] FancyExpr
+  | UnaryDefF Name [Name] FancyExpr
+  | BinaryOpF Name Expr Expr
+  | UnaryOpF Name FancyExpr
+  | KlassF Name FancyAST
+  | IncludeF Name FancyAST
+  | IncludeCoreF Name FancyAST
+  | IfF Expr FancyAST FancyAST
+  | ForF FancyAST FancyExpr FancyExpr FancyAST
+  | AsyncF FancyExpr FancyExpr FancyExpr
   deriving (Eq, Ord, Show)
