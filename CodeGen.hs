@@ -117,7 +117,6 @@ codeGen ((Call cklass name params):ast) klass depth =
 codeGen (expr:ast) klass depth =
     (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (codeGen ast klass (depth+1))
 
-
 fancyCodeGen :: FancyAST -> String -> Int -> String
 fancyCodeGen [] _ _ = ""
 fancyCodeGen ((env, (KlassF name stmts)):ast) _ depth =
