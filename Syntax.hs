@@ -50,7 +50,7 @@ data FancyExpr -- for FancyAst
   | KlassF Name FancyAST
   | IncludeF Name FancyAST
   | IncludeCoreF Name FancyAST
-  | IfF Expr FancyAST FancyAST
+  | IfF FancyASTEntry FancyAST FancyAST
   | ForF FancyASTEntry FancyASTEntry FancyASTEntry FancyAST
   | AsyncF FancyExpr FancyExpr FancyExpr
   deriving (Eq, Ord, Show)

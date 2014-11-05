@@ -54,5 +54,5 @@ main = do
                 let (fast, funcenv, varenv, log) = doTypecheck ex
                 putStrLn $ join "\n" log
                 putStrLn $ fancyCodeGen funcenv fast "" 0
-                putStrLn $ show fast
+                --putStrLn $ show fast
         return ()

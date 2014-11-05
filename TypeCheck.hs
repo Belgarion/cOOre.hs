@@ -23,23 +23,23 @@ typecheck [] funcenv env trace curclass = ([], funcenv, env, [])
 typecheck ((Klass name expr):ast) funcenv env trace curclass =
     ((env, (KlassF name fast1)):fast2, nf2, env, nl1 ++ nl2)
     where
-        (fast1, nf1, ne1, nl1) = typecheck (expr) funcenv env (newtrace) curclass
-        (fast2, nf2, ne2, nl2) = typecheck (ast) funcenv env trace curclass
+        (fast1, nf1, ne1, nl1) = typecheck (expr) funcenv env (newtrace) name
+        (fast2, nf2, ne2, nl2) = typecheck (ast) nf1 env trace curclass
         newtrace = (trace ++ (if trace == "" then "" else "§") ++ name)
 typecheck ((Function t name params stmts):ast) funcenv env trace curclass =
-    ((env, (FunctionF t name params fast1)):fast2, env, env, nlparams ++ nl1 ++ nl2)
+    ((env, (FunctionF t name params fast1)):fast2, nf2, env, nlparams ++ nl1 ++ nl2)
     where
         (fparams, nfparams, neparams, nlparams) = typecheck params newfuncenv env (newtrace) curclass
         (fast1, nf1, ne1, nl1) = typecheck stmts newfuncenv env (newtrace) curclass
         (fast2, nf2, ne2, nl2) = typecheck (ast) newfuncenv env trace curclass
         newtrace = (trace ++ (if trace == "" then "" else "§") ++ name)
-        newfuncenv = Data.Map.insert name t funcenv
+        newfuncenv = Data.Map.insert (curclass ++ "." ++ name) t funcenv
 typecheck ((Var name):ast) funcenv env trace curclass =
     ((env, (VarF name)):fast, nf, ne, nl)
     where
       (fast, nf, ne, nl) = typecheck (ast) funcenv env trace curclass
 typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
-    ((env, (BinaryOpF name (firstFExpr last) (firstFExpr rast) )):fast, newfuncenv2, env, (if x == "" then "" else x):(logl ++ logr ++ log2))
+    ((env, (BinaryOpF name (firstFExpr last) (firstFExpr rast) )):fast, newfuncenv2, env, (if x == "" then [] else [x])++(logl ++ logr ++ log2))
     where
         (fast, newfuncenv2, newenv3, log2) = (typecheck ast newfuncenvv newenvv2 trace curclass)
         (rast, newfuncenvv, newenvv2, logr) = (typecheck ([right]) newfuncenv newenv2 trace curclass)
@@ -78,15 +78,15 @@ typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
 typecheck ((Call klass name params):ast) funcenv env trace curclass =
     ((env, (CallF cklass name past)):fast, funcenv, env, if error == "" then log else (error:log))
     where
-        cklass = case (Data.Map.lookup name funcenv) of
-            Nothing -> case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
+        cklass = case (klass) of
+            "" -> curclass
+            otherwise -> case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
                 Nothing -> ""
                 Just s -> klass
-            Just s -> ""
         log = plog ++ flog
         (fast, _, _, flog) = typecheck (ast) funcenv env trace curclass
         (past, _, _, plog) = typecheck (params) funcenv env trace curclass
-        error = case (Data.Map.lookup name funcenv) of
+        error = case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
             Nothing -> "Undeclared function " ++ name
             Just s -> ""
 typecheck ((Float value):ast) funcenv env trace curclass =
@@ -101,7 +101,7 @@ typecheck ((Async after before stmt):ast) funcenv env trace curclass =
     typecheck (stmt:ast) funcenv env trace curclass --TODO
 
 typecheck ((If cond true false):ast) funcenv env trace curclass =
-    (((env, (IfF cond asttrue astfalse)):fast), funcenv, env, (nlcond ++ nltrue ++ nlfalse ++ nlast))
+    (((env, (IfF (firstFExpr astcond) asttrue astfalse)):fast), funcenv, env, (nlcond ++ nltrue ++ nlfalse ++ nlast))
     where
         (astcond, nfcond, necond, nlcond) = typecheck [cond] funcenv env trace curclass
         (asttrue, nftrue, netrue, nltrue) = typecheck true funcenv env trace curclass
@@ -154,7 +154,7 @@ typetostring (BinaryOp op left right) funcenv env =
     then (typetostring left funcenv env)
     else ("Unmatched types : (" ++ (typetostring left funcenv env) ++ ") (" ++ (typetostring right funcenv env) ++ ")" ++ " near " ++ show(BinaryOp op left right))
 typetostring (Call klass name params) funcenv env = -- if klass == "" inom samma klass
-    case (Data.Map.lookup name funcenv) of
+    case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
         Nothing -> "Undeclared function " ++ name
         Just s -> s
 typetostring x _ _ = "unknown (" ++ (show x) ++ ")"

@@ -1,3 +1,9 @@
+struktur hej
+    hel a(x = 0)
+        hej = 2
+        återvänd hej
+    klar
+meep
 struktur foo
 	barfoo = 2
 	barfoofoo = ""
@@ -15,11 +21,12 @@ struktur foo
         hej
         °*
         °*
-        om largerThan(1 2)
+        hej§a(5)
+        om ext§largerThan(1 2)
          kalle = 5
          (10+10)*10
         klar
-        för iass=0 largerThan(iass 4) iass=iass+1
+        för iass=0 ext§largerThan(iass 4) iass=iass+1
             bar(iass "hej")
         klar
 		återvänd x

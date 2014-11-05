@@ -162,7 +162,7 @@ fancyCodeGen funcenv ((env, (FloatF value)):ast) klass depth =
 fancyCodeGen funcenv ((env, (StringF value)):ast) klass depth =
     (ind depth) ++ (show value) ++ (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (IfF cond th el)):ast) klass depth =
-    (ind depth) ++ "if (" ++ (codeGen [cond] klass 0) ++ ") {\n" ++
+    (ind depth) ++ "if (" ++ (fancyCodeGen funcenv [cond] klass 0) ++ ") {\n" ++
     (genTypDef' [x | (env, x) <- th, isAss' (env, x), not (inEnv env x)]) ++
     (join "\n" [fancyCodeGen funcenv [x] klass (depth+1) | x <- th]) ++ "\n" ++ (ind depth) ++
     "} else {\n" ++
