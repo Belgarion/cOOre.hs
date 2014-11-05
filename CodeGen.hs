@@ -29,7 +29,7 @@ typestringToCtype :: Type -> String
 typestringToCtype "hel" = "int "
 typestringToCtype "sträng" = "char * "
 typestringToCtype "flyt" = "float "
-typestringToCtype "def" = "task "
+typestringToCtype "def" = "Task "
 typestringToCtype x = "aeurchaoeurchaoeurch (" ++ x ++ ")"
 
 -- generates typdefs for c structs and c function args
