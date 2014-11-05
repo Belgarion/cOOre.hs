@@ -6,6 +6,7 @@ import Data.Map
 import Dictionary
 
 import Debug.Trace
+import System.IO.Unsafe
 
 import PrettyPrinting (join, ind)
 
@@ -186,5 +187,10 @@ fancyCodeGen funcenv ((env, (CallF cklass name params)):ast) klass depth =
     (join ", " [fancyCodeGen funcenv [x] klass 0 | x <- params]) ++ ")" ++
     (if depth == 0 then "" else ";\n")  ++
     (fancyCodeGen funcenv ast klass depth)
+fancyCodeGen funcenv ((env, (IncludeCoreF name defs)):ast) klass depth =
+    contents ++
+    fancyCodeGen funcenv ast klass depth
+    where
+        contents = unsafePerformIO (readFile name)
 fancyCodeGen funcenv (expr:ast) klass depth =
     (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (fancyCodeGen funcenv ast klass (depth+1))

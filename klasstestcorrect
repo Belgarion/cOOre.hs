@@ -1,3 +1,4 @@
+referera "websocket/std.coore"
 struktur hej
     hel a(x = 0)
         hej = 2
@@ -22,11 +23,11 @@ struktur foo
         °*
         °*
         hej§a(5)
-        om ext§largerThan(1 2)
+        om ext§greaterThan(1 2)
          kalle = 5
          (10+10)*10
         klar
-        för iass=0 ext§largerThan(iass 4) iass=iass+1
+        för iass=0 ext§greaterThan(iass 4) iass=iass+1
             bar(iass "hej")
         klar
 		återvänd x

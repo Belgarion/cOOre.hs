@@ -71,10 +71,10 @@ printAst((Claim name stmts):ast) depth =
     (printAst stmts (depth+1)) ++ "\n" ++ (ind depth) ++ "klar" ++
     (printAst ast depth)
 printAst((Include name _):ast) depth =
-    "referera " ++ name ++ "\n\n" ++
+    "referera \"" ++ name ++ "\"\n\n" ++
     (printAst ast depth)
 printAst((IncludeCore name stmts):ast) depth =
-    "refereracore " ++ name ++ "\n" ++ (printAst stmts (depth+1)) ++ "meep\n\n" ++
+    "refereracore \"" ++ name ++ "\"\n" ++ (printAst stmts (depth+1)) ++ "meep\n\n" ++
     (printAst ast depth)
 printAst (expr:ast) depth =
     (ind depth) ++ "other :: " ++ (show expr) ++

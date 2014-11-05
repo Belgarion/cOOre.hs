@@ -39,7 +39,7 @@ typecheck ((Var name):ast) funcenv env trace curclass =
     where
       (fast, nf, ne, nl) = typecheck (ast) funcenv env trace curclass
 typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
-    ((env, (BinaryOpF name (firstFExpr last) (firstFExpr rast) )):fast, newfuncenv2, env, (if x == "" then [] else [x])++(logl ++ logr ++ log2))
+    ((env, (BinaryOpF name (firstFExpr last) (firstFExpr rast) )):fast, newfuncenv2, newenv3, (if x == "" then [] else [x])++(logl ++ logr ++ log2))
     where
         (fast, newfuncenv2, newenv3, log2) = (typecheck ast newfuncenvv newenvv2 trace curclass)
         (rast, newfuncenvv, newenvv2, logr) = (typecheck ([right]) newfuncenv newenv2 trace curclass)
@@ -86,8 +86,8 @@ typecheck ((Call klass name params):ast) funcenv env trace curclass =
         log = plog ++ flog
         (fast, _, _, flog) = typecheck (ast) funcenv env trace curclass
         (past, _, _, plog) = typecheck (params) funcenv env trace curclass
-        error = case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
-            Nothing -> "Undeclared function " ++ name
+        error = case (Data.Map.lookup (cklass ++ "." ++ name) funcenv) of
+            Nothing -> "Undeclared function " ++ klass ++ "." ++ name
             Just s -> ""
 typecheck ((Float value):ast) funcenv env trace curclass =
     ((env, (FloatF value)):fast, funcenv, env, log)
@@ -135,7 +135,10 @@ typecheck ((Claim name stmts):ast) funcenv env trace curclass =
 typecheck ((Include filename stmts):ast) funcenv env trace curclass =
     typecheck (stmts ++ ast) funcenv env trace curclass -- TODO
 typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass =
-    typecheck (defs ++ ast) funcenv env trace curclass -- TODO
+    ((env, (IncludeCoreF filename iast)):fast, newfuncenv, env, nl1 ++ nl2)
+    where
+        (fast, newfuncenv, _, nl1) = (typecheck ast nf2 env trace curclass)
+        (iast, nf2, _, nl2) = (typecheck defs funcenv env trace "ext")
 typecheck (expr:ast) funcenv env trace curclass =
     (fast, newfuncenv, env, ("Other " ++ (show expr)):log)
     where
@@ -155,6 +158,6 @@ typetostring (BinaryOp op left right) funcenv env =
     else ("Unmatched types : (" ++ (typetostring left funcenv env) ++ ") (" ++ (typetostring right funcenv env) ++ ")" ++ " near " ++ show(BinaryOp op left right))
 typetostring (Call klass name params) funcenv env = -- if klass == "" inom samma klass
     case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
-        Nothing -> "Undeclared function " ++ name
+        Nothing -> "Undeclared function " ++ klass ++ "." ++ name
         Just s -> s
 typetostring x _ _ = "unknown (" ++ (show x) ++ ")"

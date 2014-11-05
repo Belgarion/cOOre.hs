@@ -1,4 +1,4 @@
-refereracore std.core
+refereracore "websocket/std.core"
 	sträng cat(leftstring="" rigthstring="")
 	klar
 	hel greaterThan(big=0 small=0)
@@ -17,6 +17,6 @@ refereracore std.core
 	klar
 	sträng malloc(size = 0)
 	klar
-	int strcmp(a = "" b = "")
-	klar 
+	hel strcmp(a = "" b = "")
+	klar
 meep

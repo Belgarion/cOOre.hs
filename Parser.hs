@@ -20,6 +20,8 @@ import Control.Monad.Trans
 import System.IO
 import System.IO.Unsafe
 
+import Debug.Trace
+
 --binop = Ex.Infix (BinaryOp <$> op) Ex.AssocLeft
 --unop = Ex.Prefix (UnaryOp <$> op)
 
@@ -207,16 +209,16 @@ klass = do
 include :: Parser Expr
 include = do
     reserved "referera"
-    name <- identifier
+    name <- str
     let ast = unsafePerformIO $ fileToAst name
     case ast of
-      Left _ -> return $ Include name []
+      Left _ -> Debug.Trace.trace ("ast " ++ (show ast)) $ return $ Include name []
       Right x -> return $ Include name x
 
 includecore :: Parser Expr
-includecore = do 
+includecore = do
   reserved "refereracore"
-  file <- identifier
+  file <- str
   stmts <- many defn
   reserved "meep"
   return $ IncludeCore file stmts
