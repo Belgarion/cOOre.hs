@@ -30,7 +30,7 @@ typecheck ((Function t name params stmts):ast) funcenv env trace curclass =
     ((env, (FunctionF t name params fast1)):fast2, nf2, env, nlparams ++ nl1 ++ nl2)
     where
         (fparams, nfparams, neparams, nlparams) = typecheck params newfuncenv env (newtrace) curclass
-        (fast1, nf1, ne1, nl1) = typecheck stmts newfuncenv env (newtrace) curclass
+        (fast1, nf1, ne1, nl1) = typecheck stmts newfuncenv neparams (newtrace) curclass
         (fast2, nf2, ne2, nl2) = typecheck (ast) newfuncenv env trace curclass
         newtrace = (trace ++ (if trace == "" then "" else "§") ++ name)
         newfuncenv = Data.Map.insert (curclass ++ "." ++ name) t funcenv
@@ -46,12 +46,12 @@ typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
         (last, newfuncenv, newenv2, logl) = (typecheck ([left]) funcenv newenv trace curclass)
         (x, newenv) = case (name) of
             "=" -> case (left, right) of
-                ((Var name),t) ->
-                    case (Dictionary.lookupinsert name (typetostring t funcenv env) env) of
+                ((Var varname),t) ->
+                    case (Dictionary.lookupinsert varname (typetostring t funcenv env) env) of
                         Just n -> ("", n)
                         Nothing -> if tl==tr then ("", env) else ("= ERROR Types not matching near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                             where
-                                tl = typetostring (Var name) funcenv env
+                                tl = typetostring (Var varname) funcenv env
                                 tr = typetostring t funcenv env
                 otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ") near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
             "+" -> case (left, right) of
@@ -88,7 +88,7 @@ typecheck ((Call klass name params):ast) funcenv env trace curclass =
         (fast, _, _, flog) = typecheck (ast) funcenv env trace curclass
         (past, _, _, plog) = typecheck (params) funcenv env trace curclass
         error = case (Data.Map.lookup (cklass ++ "." ++ name) funcenv) of
-            Nothing -> "Undeclared function " ++ klass ++ "." ++ name
+            Nothing -> Debug.Trace.trace (show funcenv) $ "Undeclared function " ++ klass ++ "." ++ name
             Just s -> ""
 typecheck ((Float value):ast) funcenv env trace curclass =
     ((env, (FloatF value)):fast, funcenv, env, log)
@@ -132,7 +132,10 @@ typecheck ((Return expr):ast) funcenv env trace curclass =
         (exprast, nfexpr, neexpr, nlexpr) = typecheck [expr] funcenv env trace curclass
         (fast, nfast, neast, nlast) = typecheck ast funcenv env trace curclass
 typecheck ((Claim name stmts):ast) funcenv env trace curclass =
-    typecheck (stmts ++ ast) funcenv env trace curclass --TODO
+    ((env, (ClaimF name iast)):fast, newfuncenv, env, nl1 ++ nl2)
+    where
+        (fast, newfuncenv, _, nl1) = typecheck ast nf2 env trace curclass
+        (iast, nf2, _, nl2) = typecheck stmts funcenv env trace curclass
 typecheck ((Include filename stmts):ast) funcenv env trace curclass =
     typecheck (stmts ++ ast) funcenv env trace curclass -- TODO
 typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass =
