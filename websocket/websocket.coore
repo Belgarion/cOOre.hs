@@ -114,8 +114,8 @@ meep
 
 
 reset
-	°async periodic()
-	°sync idle_websocket()
+	async efter 500 server§sendData()
+	sync idle_websocket()
 klar
 
 
