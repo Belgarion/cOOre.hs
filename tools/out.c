@@ -1,10 +1,9 @@
-typedef char* char_p;
 // RTFM-core for RTFM-RT
-const char* CORE_FILE_INFO = "Compiled with : RTFM-core options:\ninfile       : websockets.core\noutfile      : websockets.c\nasync_err    : false\ntarget       : RTFM_RT\nbackend      : GCC\nverbose      : false\ndebug        : false\ngv_task      : false\ngv_taskf     : \ngv_res       : false\ngv_resf      : \nd_ast        : false\n";
+const char* CORE_FILE_INFO = "Compiled with : RTFM-core options:\ninfile       : out.core\noutfile      : out.c\nasync_err    : false\ntarget       : RTFM_RT\nbackend      : GCC\nverbose      : false\ndebug        : false\ngv_task      : false\ngv_taskf     : \ngv_res       : false\ngv_resf      : \nd_ast        : false\n";
 
-enum resources {send,RES_NR};
+enum resources {sendLock,RES_NR};
 int ceilings[] = {2};
-const char* res_names[] = {"send"};
+const char* res_names[] = {"sendLock"};
 enum entry_nr {user_reset_nr, user_idle_nr, reset_server_sendData_0_nr, reset_server_sendData_0_server_sendData_0_nr, reset_idle_websocket_0_client_receive_0_nr, ENTRY_NR};
 int entry_prio[] = {0, 0, 2, 2, 1};
 char* entry_names[] = {"user_reset", "user_idle", "reset_server_sendData_0", "reset_server_sendData_0_server_sendData_0", "reset_idle_websocket_0_client_receive_0"};
@@ -18,7 +17,7 @@ void reset_server_sendData_0_server_sendData_0(int RTFM_id); // function prototy
 void entry_reset_server_sendData_0_server_sendData_0(int RTFM_id); // function prototype for the instance task
 
 // Task instance definition: @prio 1 reset_idle_websocket_0_client_receive_0
-void reset_idle_websocket_0_client_receive_0(int RTFM_id, char_p msg); // function prototype for the instance task
+void reset_idle_websocket_0_client_receive_0(int RTFM_id, char* msg); // function prototype for the instance task
 void entry_reset_idle_websocket_0_client_receive_0(int RTFM_id); // function prototype for the instance task
 
 ENTRY_FUNC entry_func[] = {user_reset, user_idle, entry_reset_server_sendData_0, entry_reset_server_sendData_0_server_sendData_0, entry_reset_idle_websocket_0_client_receive_0};
@@ -28,20 +27,74 @@ ARG_reset_server_sendData_0 arg_reset_server_sendData_0; // instance for argumen
 void entry_reset_server_sendData_0(int RTFM_id) {
 	reset_server_sendData_0(RTFM_id); // (inlined) call to the async function
 }
-int reset_server_sendData_0_send_server_addJson_0(int RTFM_id, char_p key, char_p value); // function prototype
-int reset_server_sendData_0_send_server_compileJson_0(int RTFM_id); // function prototype
+int reset_server_sendData_0_sendLock_server_addJson_0(int RTFM_id, char* key, char* value); // function prototype
+int reset_server_sendData_0_sendLock_server_compileJson_0(int RTFM_id); // function prototype
+void reset_server_sendData_0_sendLock_ws_send_0(int RTFM_id, char* message); // function prototype
 typedef struct {;} ARG_reset_server_sendData_0_server_sendData_0; // type definition for arguments
 ARG_reset_server_sendData_0_server_sendData_0 arg_reset_server_sendData_0_server_sendData_0; // instance for argument
 void entry_reset_server_sendData_0_server_sendData_0(int RTFM_id) {
 	reset_server_sendData_0_server_sendData_0(RTFM_id); // (inlined) call to the async function
 }
 void reset_idle_websocket_0(int RTFM_id); // function prototype
-typedef struct {char_p msg;} ARG_reset_idle_websocket_0_client_receive_0; // type definition for arguments
+typedef struct {char* msg;} ARG_reset_idle_websocket_0_client_receive_0; // type definition for arguments
 ARG_reset_idle_websocket_0_client_receive_0 arg_reset_idle_websocket_0_client_receive_0; // instance for argument
 void entry_reset_idle_websocket_0_client_receive_0(int RTFM_id) {
 	reset_idle_websocket_0_client_receive_0(RTFM_id, arg_reset_idle_websocket_0_client_receive_0.msg); // (inlined) call to the async function
 }
 int reset_idle_websocket_0_client_receive_0_server_reset1_0(int RTFM_id); // function prototype
+
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <openssl/sha.h>
+#include <openssl/bio.h>
+#include <openssl/evp.h>
+#include <math.h>
+#include "fmemopen.h"
+
+#ifdef TRACE_WS
+#define DPS(fmt, ...) {fprintf(stderr, "\tWS:<%f> "fmt"\n", RT_time_to_float(time_get()), ##__VA_ARGS__);}
+#else
+#define DPS(...) 
+#endif
+
+typedef char* char_p;
+
+// Encodes a string to base64
+int Base64Encode(const char* message, int len, char** buffer) { 
+  BIO *bio, *b64;
+  FILE* stream;
+  int encodedSize = 4 * ceil((double) len / 3);
+  *buffer = (char *) malloc(encodedSize + 1);
+
+  stream = fmemopen(*buffer, encodedSize + 1, "w");
+  b64 = BIO_new(BIO_f_base64());
+  bio = BIO_new_fp(stream, BIO_NOCLOSE);
+  bio = BIO_push(b64, bio);
+  BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // write everything in one line
+  BIO_write(bio, message, len);
+
+  BIO_flush(bio);
+  BIO_free_all(bio);
+  fclose(stream);
+
+  return (0); //success
+}
+
+int connfd = 0;
+void error(char* err) {
+  fprintf(stderr, "%s", err);
+  exit(0);
+}
+
+char* resp1 = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n";
+char* resp2 = "Sec-WebSocket-Accept: ";
+char* resp3 = "Sec-WebSocket-Protocol: lost-protocol\r\n\r\n"; // with an extra blank line
+char* magic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
+char sendBuff[1025];
 
 
 #include <string.h>
@@ -95,62 +148,9 @@ char* itoa(int i, char b[]){
 }
 
 
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <openssl/sha.h>
-#include <openssl/bio.h>
-#include <openssl/evp.h>
-#include <math.h>
-#include "fmemopen.h"
-
-#ifdef TRACE_WS
-#define DPS(fmt, ...) {fprintf(stderr, "\tWS:<%f> "fmt"\n", RT_time_to_float(time_get()), ##__VA_ARGS__);}
-#else
-#define DPS(...) 
-#endif
-
-
-
-// Encodes a string to base64
-int Base64Encode(const char* message, int len, char** buffer) { 
-  BIO *bio, *b64;
-  FILE* stream;
-  int encodedSize = 4 * ceil((double) len / 3);
-  *buffer = (char *) malloc(encodedSize + 1);
-
-  stream = fmemopen(*buffer, encodedSize + 1, "w");
-  b64 = BIO_new(BIO_f_base64());
-  bio = BIO_new_fp(stream, BIO_NOCLOSE);
-  bio = BIO_push(b64, bio);
-  BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // write everything in one line
-  BIO_write(bio, message, len);
-
-  BIO_flush(bio);
-  BIO_free_all(bio);
-  fclose(stream);
-
-  return (0); //success
-}
-
-int connfd = 0;
-void error(char* err) {
-  fprintf(stderr, "%s", err);
-  exit(0);
-}
-
-char* resp1 = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n";
-char* resp2 = "Sec-WebSocket-Accept: ";
-char* resp3 = "Sec-WebSocket-Protocol: lost-protocol\r\n\r\n"; // with an extra blank line
-char* magic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-
-char sendBuff[1025];
-
 struct struct_server {
 int endTime;
-char_p sendBuff;
+char* sendBuff;
 int sendTime;
 int currentTime;
 };
@@ -174,24 +174,25 @@ RTFM_pend(0, 500000, RTFM_id, reset_server_sendData_0_nr);
 reset_idle_websocket_0(RTFM_id);
 }
 void reset_server_sendData_0(int RTFM_id){ // function implementation for the task:reset_server_sendData_0[reset_server_sendData_0]
-RTFM_lock(RTFM_id, send);
+RTFM_lock(RTFM_id, sendLock);
+char* timeString;
 timeString = malloc(8* ilen(server.currentTime / 1000));
 itoa(server.currentTime / 1000, timeString );
-reset_server_sendData_0_send_server_addJson_0(RTFM_id, "time", timeString);
-reset_server_sendData_0_send_server_compileJson_0(RTFM_id);
-ws_send(server.sendBuff );
+reset_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
+reset_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
+reset_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
 server.currentTime = server.sendTime + server.currentTime ;
-free(send_buff );
-RTFM_unlock(RTFM_id, send);
+free(server.sendBuff );
+RTFM_unlock(RTFM_id, sendLock);
 arg_reset_server_sendData_0_server_sendData_0 = (ARG_reset_server_sendData_0_server_sendData_0){}; 
 RTFM_pend(0, 4000, RTFM_id, reset_server_sendData_0_server_sendData_0_nr);
 }
-int reset_server_sendData_0_send_server_addJson_0(int RTFM_id, char_p key, char_p value){
-char_p temp1;
-char_p temp2;
-char_p temp3;
-char_p temp4;
-char_p temp;
+int reset_server_sendData_0_sendLock_server_addJson_0(int RTFM_id, char* key, char* value){
+char* temp1;
+char* temp2;
+char* temp3;
+char* temp4;
+char* temp;
 temp1 = "";
 if (isEqual(0, strlen(server.sendBuff ))) {
 temp1 = cat("\"", key );
@@ -215,25 +216,40 @@ server.sendBuff = temp ;
 free(temp4 );
 return 1;
 }
-int reset_server_sendData_0_send_server_compileJson_0(int RTFM_id){
-char_p temp1;
-char_p temp2;
+int reset_server_sendData_0_sendLock_server_compileJson_0(int RTFM_id){
+char* temp1;
+char* temp2;
 temp1 = cat("{", server.sendBuff );
 temp2 = cat(server.sendBuff , "}");
 server.sendBuff = temp2 ;
 free(temp1 );
 return 1;
 }
+void reset_server_sendData_0_sendLock_ws_send_0(int RTFM_id, char* message){
+if (connfd == 0)
+    return;
+
+  unsigned char *out_decoded = (unsigned char *) &sendBuff[2]; //6 with mask
+  sprintf((char *) out_decoded, "%s", message);
+
+  int len = strlen(message);
+  if (len > 126)
+    error("we do not support split messages\n");
+  sendBuff[0] = 0x80 | 0x1; // FIN + text_msg opcode
+  sendBuff[1] = 0x00 | len; // no mask
+  send(connfd, sendBuff, len + 2, 0);
+}
 void reset_server_sendData_0_server_sendData_0(int RTFM_id){ // function implementation for the task:reset_server_sendData_0_server_sendData_0[reset_server_sendData_0]
-RTFM_lock(RTFM_id, send);
+RTFM_lock(RTFM_id, sendLock);
+char* timeString;
 timeString = malloc(8* ilen(server.currentTime / 1000));
 itoa(server.currentTime / 1000, timeString );
-reset_server_sendData_0_send_server_addJson_0(RTFM_id, "time", timeString);
-reset_server_sendData_0_send_server_compileJson_0(RTFM_id);
-ws_send(server.sendBuff );
+reset_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
+reset_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
+reset_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
 server.currentTime = server.sendTime + server.currentTime ;
-free(send_buff );
-RTFM_unlock(RTFM_id, send);
+free(server.sendBuff );
+RTFM_unlock(RTFM_id, sendLock);
 arg_reset_server_sendData_0_server_sendData_0 = (ARG_reset_server_sendData_0_server_sendData_0){}; 
 RTFM_pend(0, 4000, RTFM_id, reset_server_sendData_0_server_sendData_0_nr);
 }
@@ -341,7 +357,7 @@ int listenfd = 0;
 
         decoded[msg_size] = 0; // terminate the string
         DPS("Text msg %s", decoded);
-arg_reset_idle_websocket_0_client_receive_0 = (ARG_reset_idle_websocket_0_client_receive_0){(char_p)decoded}; 
+arg_reset_idle_websocket_0_client_receive_0 = (ARG_reset_idle_websocket_0_client_receive_0){(char*)decoded}; 
 RTFM_pend(0, 4611686018427387903, RTFM_id, reset_idle_websocket_0_client_receive_0_nr);
 }
       DPS("trying to reconnect");
@@ -351,7 +367,7 @@ RTFM_pend(0, 4611686018427387903, RTFM_id, reset_idle_websocket_0_client_receive
   // never happens	
   close(listenfd);
 }
-void reset_idle_websocket_0_client_receive_0(int RTFM_id, char_p msg){ // function implementation for the task:reset_idle_websocket_0_client_receive_0[reset_idle_websocket_0_client_receive_0]
+void reset_idle_websocket_0_client_receive_0(int RTFM_id, char* msg){ // function implementation for the task:reset_idle_websocket_0_client_receive_0[reset_idle_websocket_0_client_receive_0]
 if (isEqual(strcmp(msg , "vinner"), 0)) {
 reset_idle_websocket_0_client_receive_0_server_reset1_0(RTFM_id);
 } else {
