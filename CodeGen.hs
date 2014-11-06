@@ -20,12 +20,12 @@ inEnv env other klass = trace (show other) False
 
 typeToCtype :: Expr -> String
 typeToCtype (Int _) = "int "
-typeToCtype (String _) = "char_p "
+typeToCtype (String _) = "char* "
 typeToCtype (Float _) = "float "
 
 typeToCtype' :: FancyExpr -> FunctionsMap -> String
 typeToCtype' (IntF _) funcenv = "int "
-typeToCtype' (StringF _) funcenv = "char_p "
+typeToCtype' (StringF _) funcenv = "char* "
 typeToCtype' (FloatF _) funcenv = "float "
 typeToCtype' (CallF klass name _) funcenv =
     case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
@@ -35,7 +35,7 @@ typeToCtype' x funcenv = "aoercuharocehuaroceuhaoeruch " ++ (show x) ++ "\n\n\n"
 
 typestringToCtype :: Type -> String
 typestringToCtype "hel" = "int "
-typestringToCtype "sträng" = "char_p "
+typestringToCtype "sträng" = "char* "
 typestringToCtype "flyt" = "float "
 typestringToCtype "def" = "Task "
 typestringToCtype x = "aeurchaoeurchaoeurch (" ++ x ++ ")\n\n\n"
