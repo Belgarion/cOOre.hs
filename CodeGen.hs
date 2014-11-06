@@ -134,5 +134,10 @@ fancyCodeGen funcenv ((env, (IncludeCoreF name defs)):ast) klass depth =
     fancyCodeGen funcenv ast klass depth
     where
         contents = unsafePerformIO (readFile name)
+fancyCodeGen funcenv ((env, (ClaimF name stmts)):ast) klass depth =
+    (ind depth) ++ "claim " ++ name ++ " {\n" ++
+    (fancyCodeGen funcenv stmts klass depth) ++
+    (ind depth) ++ "}\n" ++
+    (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv (expr:ast) klass depth =
     (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (fancyCodeGen funcenv ast klass (depth+1))
