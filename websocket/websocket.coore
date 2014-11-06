@@ -62,7 +62,7 @@ struktur server
 			ext§itoa(currentTime/1000 timeString)
 			addJson("time" timeString)
 			compileJson()
-			sync ext§ws_send(sendBuff)
+			ext§ws_send(sendBuff)
 			currentTime = sendTime + currentTime
 
 			ext§free(send_buff)
