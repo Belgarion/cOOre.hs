@@ -132,7 +132,10 @@ typecheck ((Return expr):ast) funcenv env trace curclass =
         (exprast, nfexpr, neexpr, nlexpr) = typecheck [expr] funcenv env trace curclass
         (fast, nfast, neast, nlast) = typecheck ast funcenv env trace curclass
 typecheck ((Claim name stmts):ast) funcenv env trace curclass =
-    typecheck (stmts ++ ast) funcenv env trace curclass --TODO
+    ((env, (ClaimF name iast)):fast, newfuncenv, env, nl1 ++ nl2)
+    where
+        (fast, newfuncenv, _, nl1) = typecheck ast nf2 env trace curclass
+        (iast, nf2, _, nl2) = typecheck stmts funcenv env trace curclass
 typecheck ((Include filename stmts):ast) funcenv env trace curclass =
     typecheck (stmts ++ ast) funcenv env trace curclass -- TODO
 typecheck ((IncludeCore filename defs):ast) funcenv env trace curclass =
