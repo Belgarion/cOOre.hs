@@ -1,7 +1,7 @@
 referera "websocket/std.coore"
 
 refereracore "websocket/websocket.core"
-	ws_send(send_buff = "")  °256
+	def ws_send(send_buff = "")  °256
 	klar
 meep
 
@@ -11,28 +11,28 @@ meep
 °	#> printf("client wrote : %s\n", msg); <#
 °}
 
-struktur client 
+struktur client
 	def recive(msg = "")
-		om isEqual(strcmp(msg "vinner"),0)
-			server§reset()
+		om isEqual(strcmp(msg "vinner") 0)
+			server§reset1()
 		annars
 		klar
 	klar
 meep
 
 struktur server
-	endTime = 1000 
+	endTime = 1000
 	sendBuff = ""
 	sendTime = 1000
 	currentTime = 0
 
 	°need begär send
-	int compileJson()
-		temp1 = cat("{",sendBuff)
-		temp2 = cat(sendBuff,"}")
+	hel compileJson()
+		temp1 = cat("{" sendBuff)
+		temp2 = cat(sendBuff "}")
 		sendBuff = temp2
 		free(temp1)
-		return 1
+		återvänd 1
 	klar
 
 
@@ -44,55 +44,55 @@ struktur server
 			complieJson()
 			sync ws_send(sendBuff)
 			currentTime = sendTime + currentTime
-			
+
 			free(send_buff)
 		klar
-		async after sendTime sendData
+		async efter 4 sendData()
 	klar
 
 	°need begär send
-	int addJson(key = "" value = "")
+	hel addJson(key = "" value = "")
 		temp1 = ""
 		om isEqual(0 strlen(sendBuff))
-			temp1 = cat("\"",key)
+			temp1 = cat("\"" key)
 		annars
-			temp1 = cat(",\"",key)
-		klar		
+			temp1 = cat(",\"" key)
+		klar
 
-		temp2 = cat(temp1,"\":\"")
-		temp3 = cat(temp2,value)
-		
+		temp2 = cat(temp1 "\":\"")
+		temp3 = cat(temp2 value)
+
 		temp4 = ""
 		om isEqual(0 strlen(sendBuff))
-			temp4 = cat(temp3, "\"")
+			temp4 = cat(temp3  "\"")
 		annars
-			temp4 = cat(temp3,"\",")
+			temp4 = cat(temp3 "\",")
 		klar
-		
+
 		free(temp1)
 		free(temp2)
 		free(temp3)
-		temp = cat(sendBuff,temp4)
+		temp = cat(sendBuff temp4)
 		free(sendBuff)
 		sendBuff = temp
 		free(temp4)
-		återvänd 1;
+		återvänd 1
 	klar
 
-	int addJsonLocked(key = "" value = "") 
+	hel addJsonLocked(key = "" value = "")
 		begär send
 			addJson(key value)
 		klar
-		återvänd 1;
+		återvänd 1
 	klar
 
-	int setSendTime(time = 0)
+	hel setSendTime(time = 0)
 		sendTime = time
-		återvänd 1;
+		återvänd 1
 	klar
-	
-	int reset()
-		endTime = 1000 
+
+	hel reset1()
+		endTime = 1000
 		free(sendBuff)
 		sendTime = 1000
 		currentTime = 0
@@ -112,11 +112,10 @@ meep
 
 
 
-Idle {
-	#> printf("User Idle\n"); <# 
-	async periodic();
-	sync idle_websocket(); 
-}
+reset
+	async periodic()
+	sync idle_websocket()
+klar
 
 
 
