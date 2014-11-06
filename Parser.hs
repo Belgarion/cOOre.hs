@@ -132,6 +132,7 @@ factor = types
       <|> try function
       <|> try call
       <|> try async
+      <|> try sync
       <|> variable
       <|> parens expr
 
@@ -187,6 +188,12 @@ async = do
     before <- option (Int 0) (do{reserved "före"; d<-int; return d})
     body <- call
     return $ Async before after body
+
+sync :: Parser Expr
+sync = do
+    reserved "sync"
+    body <- call
+    return $ Sync body
 
 defn :: Parser Expr
 defn = try extern

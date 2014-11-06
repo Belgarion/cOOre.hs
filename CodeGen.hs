@@ -33,6 +33,10 @@ typestringToCtype "flyt" = "float "
 typestringToCtype "def" = "Task "
 typestringToCtype x = "aeurchaoeurchaoeurch (" ++ x ++ ")"
 
+printValue :: Expr -> String
+printValue (Int value) = show value
+printValue (Float value) = show value
+
 -- generates typdefs for c structs and c function args
 -- 			 ast	    defs
 genTypDef' :: [FancyExpr] -> String
@@ -138,6 +142,18 @@ fancyCodeGen funcenv ((env, (ClaimF name stmts)):ast) klass depth =
     (ind depth) ++ "claim " ++ name ++ " {\n" ++
     (fancyCodeGen funcenv stmts klass depth) ++
     (ind depth) ++ "}\n" ++
+    (fancyCodeGen funcenv ast klass depth)
+fancyCodeGen funcenv ((env, (AsyncF after before stmt)):ast) klass depth =
+    (ind depth) ++ "async " ++
+    (if after == (Int 0) then "" else (" after " ++ (printValue after) ++ " ms ")) ++
+    (if before == (Int 0) then "" else (" before " ++ (printValue before) ++ " ms ")) ++
+    (fancyCodeGen funcenv [stmt] klass 0) ++
+    (ind depth) ++ ";\n" ++
+    (fancyCodeGen funcenv ast klass depth)
+fancyCodeGen funcenv ((env, (SyncF stmt)):ast) klass depth =
+    (ind depth) ++ "sync " ++
+    (fancyCodeGen funcenv [stmt] klass 0) ++
+    (ind depth) ++ ";\n" ++
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv (expr:ast) klass depth =
     (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (fancyCodeGen funcenv ast klass (depth+1))

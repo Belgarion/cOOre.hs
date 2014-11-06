@@ -92,7 +92,7 @@ struktur server
 meep
 
 struktur client
-	def recive(msg = "")
+	def receive(msg = "")
 		om ext§isEqual(ext§strcmp(msg "vinner") 0)
 			server§reset1()
 		annars
@@ -115,7 +115,7 @@ meep
 
 reset
 	async efter 500 server§sendData()
-	sync idle_websocket()
+    sync ext§idle_websocket()
 klar
 
 

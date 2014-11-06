@@ -99,7 +99,15 @@ typecheck ((Int value):ast) funcenv env trace curclass =
     where
         (fast, _, _, log) = typecheck (ast) funcenv env trace curclass
 typecheck ((Async after before stmt):ast) funcenv env trace curclass =
-    typecheck (stmt:ast) funcenv env trace curclass --TODO
+    ((env, (AsyncF after before (firstFExpr iast))):fast, funcenv, env, nl1 ++ nl2)
+    where
+        (iast, _, _, nl1) = typecheck [stmt] funcenv env trace curclass
+        (fast, _, _, nl2) = typecheck ast funcenv env trace curclass
+typecheck ((Sync stmt):ast) funcenv env trace curclass =
+    ((env, (SyncF (firstFExpr iast))):fast, funcenv, env, nl1 ++ nl2)
+    where
+        (iast, _, _, nl1) = typecheck [stmt] funcenv env trace curclass
+        (fast, _, _, nl2) = typecheck ast funcenv env trace curclass
 
 typecheck ((If cond true false):ast) funcenv env trace curclass =
     (((env, (IfF (firstFExpr astcond) asttrue astfalse)):fast), funcenv, env, (nlcond ++ nltrue ++ nlfalse ++ nlast))

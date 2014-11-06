@@ -26,6 +26,7 @@ data Expr
   | If Expr [Expr] [Expr]
   | For Expr Expr Expr [Expr]
   | Async Expr Expr Expr
+  | Sync Expr
   deriving (Eq, Ord, Show)
 
 type FunctionsMap = Data.Map.Map String String
@@ -52,5 +53,6 @@ data FancyExpr -- for FancyAst
   | IncludeCoreF Name FancyAST
   | IfF FancyASTEntry FancyAST FancyAST
   | ForF FancyASTEntry FancyASTEntry FancyASTEntry FancyAST
-  | AsyncF FancyExpr FancyExpr FancyExpr
+  | AsyncF Expr Expr FancyASTEntry
+  | SyncF FancyASTEntry
   deriving (Eq, Ord, Show)
