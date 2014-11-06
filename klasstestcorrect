@@ -36,5 +36,5 @@ struktur foo
 meep
 
 reset
-    foo§foo(1  "hej")
+    foo(1  "hej")
 klar

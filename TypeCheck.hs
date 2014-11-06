@@ -47,33 +47,33 @@ typecheck ((BinaryOp name left right):ast) funcenv env trace curclass =
         (x, newenv) = case (name) of
             "=" -> case (left, right) of
                 ((Var varname),t) ->
-                    case (Dictionary.lookupinsert varname (typetostring t funcenv env) env) of
+                    case (Dictionary.lookupinsert ((if trace == curclass then (curclass ++ ".") else "") ++varname) (typetostring t funcenv env curclass) env) of
                         Just n -> ("", n)
                         Nothing -> if tl==tr then ("", env) else ("= ERROR Types not matching near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                             where
-                                tl = typetostring (Var varname) funcenv env
-                                tr = typetostring t funcenv env
+                                tl = typetostring (Var varname) funcenv env curclass
+                                tr = typetostring t funcenv env curclass
                 otherwise -> ("= ERROR (" ++ (show left) ++ ") " ++ name ++ " ("++ (show right) ++ ") near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
             "+" -> case (left, right) of
                 (t,t2) -> if ts==ts2 then ("", env) else ("+ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
-                    ts = typetostring t funcenv env
-                    ts2 = typetostring t2 funcenv env
+                    ts = typetostring t funcenv env curclass
+                    ts2 = typetostring t2 funcenv env curclass
             "-" -> case (left, right) of
                 (t,t2) -> if ts==ts2 then ("", env) else ("- ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
-                    ts = typetostring t funcenv env
-                    ts2 = typetostring t2 funcenv env
+                    ts = typetostring t funcenv env curclass
+                    ts2 = typetostring t2 funcenv env curclass
             "*" -> case (left, right) of
                 (t,t2) -> if ts==ts2 then ("", env) else ("* ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
-                    ts = typetostring t funcenv env
-                    ts2 = typetostring t2 funcenv env
+                    ts = typetostring t funcenv env curclass
+                    ts2 = typetostring t2 funcenv env curclass
             "/" -> case (left, right) of
                 (t,t2) -> if ts==ts2 then ("", env) else ("/ ERROR: Unmatched types: (" ++ ts ++ ") (" ++ ts2 ++ ")" ++ " near " ++ trace ++ "§" ++ show(BinaryOp name left right), env)
                     where
-                    ts = typetostring t funcenv env
-                    ts2 = typetostring t2 funcenv env
+                    ts = typetostring t funcenv env curclass
+                    ts2 = typetostring t2 funcenv env curclass
             otherwise -> ("Unhandled binaryop " ++ name, env)
 typecheck ((Call klass name params):ast) funcenv env trace curclass =
     ((env, (CallF cklass name past)):fast, funcenv, env, if error == "" then log else (error:log))
@@ -156,20 +156,22 @@ typecheck (expr:ast) funcenv env trace curclass =
     where
         (fast, newfuncenv, newenv, log) = (typecheck ast funcenv env trace curclass)
 
-typetostring :: Expr -> FunctionsMap -> VariablesMap-> String
-typetostring (String _) _ _ = "sträng"
-typetostring (Int _) _ _ = "hel"
-typetostring (Float _) _ _ = "flyt"
-typetostring (Void) _ _ = "def"
-typetostring (Var name) funcenv env = case (Data.Map.lookup (name) env) of
-                        Nothing -> "undeclared variable " ++ name
+typetostring :: Expr -> FunctionsMap -> VariablesMap -> String -> String
+typetostring (String _) _ _ _ = "sträng"
+typetostring (Int _) _ _ _ = "hel"
+typetostring (Float _) _ _ _ = "flyt"
+typetostring (Void) _ _ _ = "def"
+typetostring (Var name) funcenv env klass = case (Data.Map.lookup (name) env) of
+                        Nothing -> case (Data.Map.lookup (klass ++ "." ++ name) env) of
+                            Nothing ->"undeclared variable " ++ name
+                            Just s -> s
                         Just s -> s
-typetostring (BinaryOp op left right) funcenv env =
-    if (typetostring left funcenv env) == (typetostring right funcenv env)
-    then (typetostring left funcenv env)
-    else ("Unmatched types : (" ++ (typetostring left funcenv env) ++ ") (" ++ (typetostring right funcenv env) ++ ")" ++ " near " ++ show(BinaryOp op left right))
-typetostring (Call klass name params) funcenv env = -- if klass == "" inom samma klass
-    case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
-        Nothing -> "Undeclared function " ++ klass ++ "." ++ name
+typetostring (BinaryOp op left right) funcenv env klass =
+    if (typetostring left funcenv env klass) == (typetostring right funcenv env klass)
+    then (typetostring left funcenv env klass)
+    else ("Unmatched types : (" ++ (typetostring left funcenv env klass) ++ ") (" ++ (typetostring right funcenv env klass) ++ ")" ++ " near " ++ show(BinaryOp op left right))
+typetostring (Call cklass name params) funcenv env klass = -- if klass == "" inom samma klass
+    case (Data.Map.lookup (cklass ++ "." ++ name) funcenv) of
+        Nothing -> "Undeclared function " ++ cklass ++ "." ++ name
         Just s -> s
-typetostring x _ _ = "unknown (" ++ (show x) ++ ")"
+typetostring x _ _ _ = "unknown (" ++ (show x) ++ ")"
