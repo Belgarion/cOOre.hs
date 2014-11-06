@@ -1,6 +1,6 @@
-referera std.coore
+referera "websocket/std.coore"
 
-refereracore websocket.core
+refereracore "websocket/websocket.core"
 	ws_send(send_buff = "")  °256
 	klar
 meep

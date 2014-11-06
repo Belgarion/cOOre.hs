@@ -239,5 +239,5 @@ parseToplevel s = parse (contents toplevel) "<stdin>" s
 fileToAst :: String -> IO(Either ParseError [Expr])
 fileToAst fname = do
     filec <- readFile fname
-    return $ parseToplevel filec
+    return $ parse (contents toplevel) fname filec
 
