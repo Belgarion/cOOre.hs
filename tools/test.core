@@ -1,0 +1,7 @@
+Func char_p test(){
+	#>return "hej"<#
+}
+
+Reset {
+	#>char * a = <#sync test();
+}
