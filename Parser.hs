@@ -81,6 +81,13 @@ function = do
   reserved "klar"
   return $ Function t name args body
 
+reset :: Parser Expr
+reset = do
+  reserved "reset"
+  body <- many expr
+  reserved "klar"
+  return $ Function "reset" "Reset" [] body
+
 arg :: Parser Expr
 arg = do
   var <- variable
@@ -195,7 +202,7 @@ contents p = do
 
 toplevel :: Parser [Expr]
 toplevel = many $ do
-    def <- klass <|> include <|> includecore
+    def <- klass <|> include <|> includecore <|> reset
     return def
 
 klass :: Parser Expr

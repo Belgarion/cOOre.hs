@@ -17,17 +17,17 @@ inEnv env other = trace (show other) False
 
 typeToCtype :: Expr -> String
 typeToCtype (Int _) = "int "
-typeToCtype (String _) = "char * "
+typeToCtype (String _) = "char_p "
 typeToCtype (Float _) = "float "
 
 typeToCtype' :: FancyExpr -> String
 typeToCtype' (IntF _) = "int "
-typeToCtype' (StringF _) = "char * "
+typeToCtype' (StringF _) = "char_p "
 typeToCtype' (FloatF _) = "float "
 
 typestringToCtype :: Type -> String
 typestringToCtype "hel" = "int "
-typestringToCtype "sträng" = "char * "
+typestringToCtype "sträng" = "char_p "
 typestringToCtype "flyt" = "float "
 typestringToCtype "def" = "Task "
 typestringToCtype x = "aeurchaoeurchaoeurch (" ++ x ++ ")"
@@ -144,11 +144,13 @@ fancyCodeGen funcenv ((env, (BinaryOpF name left right)):ast) klass depth =
     (fancyCodeGen funcenv [right] klass 0) ++ (if depth == 0 then "" else ";<#\n") ++
     (fancyCodeGen funcenv ast klass (depth))
 fancyCodeGen funcenv ((env, (FunctionF t name params stmts)):ast) klass depth =
-    (ind depth) ++ (if (typestringToCtype t == "Task ") then "" else "#>" ) ++ (typestringToCtype t) ++ klass ++ "_" ++ name ++ "(" ++
+    (ind depth) ++ (if t == "reset" then "" else (if (typestringToCtype t == "Task ") then "" else "Func ")
+    ++ (typestringToCtype t) ++ klass ++ "_") ++
+    name ++ (if t == "reset" then "" else ("(" ++
     (join ", " [(typeToCtype typ) ++ name | (BinaryOp "=" (Var name) typ) <- params]) ++
-    ") {\n" ++ (if (typestringToCtype t == "Task ") then "" else "<#" ) ++
+    ")")) ++ " {\n" ++
     "#>" ++ (genTypDef' [x | (env, x) <- stmts, isAss' (env, x), not (inEnv env x)]) ++ "<#" ++
-    (fancyCodeGen funcenv stmts klass (depth+1)) ++ "#>\n}\n<#" ++
+    (fancyCodeGen funcenv stmts klass (depth+1)) ++ "\n}\n" ++
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (VarF name)):ast) klass depth =
     (ind depth) ++ (if (depth == -1) then (klass ++ ".") else path) ++ name ++ " " ++ (fancyCodeGen funcenv ast klass depth)
@@ -183,12 +185,14 @@ fancyCodeGen funcenv ((env, (ReturnF value)):ast) klass depth =
     (ind depth) ++ "#>return " ++ (fancyCodeGen funcenv [value] klass 0) ++ ";<#\n" ++
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (CallF cklass name params)):ast) klass depth =
-    (ind depth) ++ isitC "#>" ++(if cklass == "" then "" else (cklass ++ "_")) ++ name ++ "(" ++
+    (ind depth) ++ (isitC "#>") ++ maybeSync ++ (if cklass == "ext" then "" else (cklass ++ "_")) ++ name ++ "(" ++
     (join ", " [fancyCodeGen funcenv [x] klass 0 | x <- params]) ++ ")" ++
-    (if depth == 0 then "" else ";<#\n")  ++
+    (if depth == 0 then "" else ";" ++ (isitC "<#") ++ "\n")  ++
     (fancyCodeGen funcenv ast klass depth)
-        where 
-            isitC str = if (getType == "def") then "" else (if (depth == 0) then "" else str)
+        where
+            maybeSync = if (depth == 0) then "" else (if cklass == "ext" then "" else getSyncAsync)
+            getSyncAsync = if getType == "def" then "async " else "sync "
+            isitC str = if (depth == 0) then "" else (if cklass == "ext" then str else "")
             getType = case (Data.Map.lookup (if (cklass == "") then "" else (cklass ++ ".")  ++ name) funcenv) of
                 Just x -> x
                 Nothing -> ""

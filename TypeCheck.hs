@@ -79,7 +79,7 @@ typecheck ((Call klass name params):ast) funcenv env trace curclass =
     ((env, (CallF cklass name past)):fast, funcenv, env, if error == "" then log else (error:log))
     where
         cklass = case (klass) of
-            "ext" -> ""
+            "ext" -> "ext"
             "" -> curclass
             otherwise -> case (Data.Map.lookup (klass ++ "." ++ name) funcenv) of
                 Nothing -> ""

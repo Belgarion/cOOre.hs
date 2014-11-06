@@ -29,7 +29,12 @@ struktur foo
         klar
         för iass=0 ext§greaterThan(iass 4) iass=iass+1
             bar(iass "hej")
+            ext§greaterThan(iass 4)
         klar
 		återvänd x
 	klar
 meep
+
+reset
+    foo§foo(1  "hej")
+klar
