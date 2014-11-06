@@ -160,7 +160,7 @@ Func void idle_websocket() {
         decoded[msg_size] = 0; // terminate the string
         DPS("Text msg %s", decoded);
 
-        <# async client_receive((char_p)decoded); #>
+        <# async client_receive((char*)decoded); #>
       }
       DPS("trying to reconnect");
       close(connfd);
@@ -171,7 +171,7 @@ Func void idle_websocket() {
   <#
 }
 
-Func void ws_send(char_p message) {
+Func void ws_send(char* message) {
   #>
   if (connfd == 0)
     return;
