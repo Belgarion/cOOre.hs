@@ -23,8 +23,8 @@ int ilen(int a){
 	int len = 0;
 	do{
 		len++;
-		a = a/10
-	}while(a)
+		a = a/10;
+	}while(a);
 	return len;
 }
 

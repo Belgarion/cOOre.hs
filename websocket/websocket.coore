@@ -59,7 +59,7 @@ struktur server
 	klar
 
 	def sendData()
-		begär send
+		begär sendLock
 			timeString = ext§malloc(8*ext§ilen(currentTime/1000))
 			ext§itoa(currentTime/1000 timeString)
 			addJson("time" timeString)
@@ -74,7 +74,7 @@ struktur server
 
 
 	hel addJsonLocked(key = "" value = "")
-		begär send
+		begär sendLock
 			addJson(key value)
 		klar
 		återvänd 1
