@@ -1,5 +1,3 @@
-referera "websocket/std.coore"
-
 refereracore "websocket/websocket.core"
 	def ws_send(send_buff = "")  °256
 	klar
@@ -7,6 +5,7 @@ refereracore "websocket/websocket.core"
     klar
 meep
 
+referera "websocket/std.coore"
 
 
 °Task client_receive(char_p msg) {
