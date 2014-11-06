@@ -3,6 +3,8 @@ referera "websocket/std.coore"
 refereracore "websocket/websocket.core"
 	def ws_send(send_buff = "")  °256
 	klar
+    def idle_websocket()
+    klar
 meep
 
 
