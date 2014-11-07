@@ -24,7 +24,7 @@ printAst((Klass name expr):ast) depth =
     "meep\n\n" ++
     (printAst ast depth)
 printAst((Function t name params stmts):ast) depth =
-    (ind depth) ++ (if t == "reset" then name else (t ++ " ") ++ name ++ "(" ++ (printAst params 0) ++ ")") ++ "\n" ++
+    (ind depth) ++ (if (t == "reset" || t == "idle") then name else (t ++ " ") ++ name ++ "(" ++ (printAst params 0) ++ ")") ++ "\n" ++
     (join "\n" ([printAst [i] (depth+1) | i <- stmts])) ++ (ind depth) ++
     "\nklar\n\n" ++
     (printAst ast depth)
@@ -48,6 +48,9 @@ printAst((Int value):ast) depth =
 printAst((Async after before stmt):ast) depth =
     (ind depth) ++ "async efter " ++ (printAst [after] 0) ++ " före " ++
     (printAst [before] 0) ++ " " ++ (printAst [stmt] 0) ++
+    (printAst ast depth)
+printAst((Sync stmt):ast) depth =
+    (ind depth) ++ "sync " ++ (printAst [stmt] 0) ++
     (printAst ast depth)
 printAst((If cond true false):ast) depth =
     (ind depth) ++ "om " ++ (printAst [cond] 0) ++ "\n" ++

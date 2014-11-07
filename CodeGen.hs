@@ -90,9 +90,9 @@ fancyCodeGen funcenv ((env, (BinaryOpF name left right)):ast) klass depth =
     (fancyCodeGen funcenv [right] klass 0) ++ (if depth == 0 then "" else ";<#\n") ++
     (fancyCodeGen funcenv ast klass (depth))
 fancyCodeGen funcenv ((env, (FunctionF t name params stmts)):ast) klass depth =
-    (ind depth) ++ (if t == "reset" then "" else (if (typestringToCtype t == "Task ") then "" else "Func ")
+    (ind depth) ++ (if (t == "reset" || t == "idle") then "" else (if (typestringToCtype t == "Task ") then "" else "Func ")
     ++ (typestringToCtype t) ++ klass ++ "_") ++
-    name ++ (if t == "reset" then "" else ("(" ++
+    name ++ (if (t == "reset" || t == "idle") then "" else ("(" ++
     (join ", " [(typeToCtype typ) ++ name | (BinaryOp "=" (Var name) typ) <- params]) ++
     ")")) ++ " {\n" ++
     "#>" ++ (genTypDef' [x | (env, x) <- stmts, isAss' (env, x), not (inEnv env x klass)] funcenv) ++ "<#" ++
