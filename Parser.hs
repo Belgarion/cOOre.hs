@@ -88,6 +88,13 @@ reset = do
   reserved "klar"
   return $ Function "reset" "Reset" [] body
 
+idle :: Parser Expr
+idle = do
+  reserved "idle"
+  body <- many expr
+  reserved "klar"
+  return $ Function "idle" "Idle" [] body
+
 arg :: Parser Expr
 arg = do
   var <- variable
@@ -187,7 +194,7 @@ async = do
     after <- option (Int 0) (do{reserved "efter"; d<-int; return d})
     before <- option (Int 0) (do{reserved "före"; d<-int; return d})
     body <- call
-    return $ Async before after body
+    return $ Async after before body
 
 sync :: Parser Expr
 sync = do
@@ -209,7 +216,7 @@ contents p = do
 
 toplevel :: Parser [Expr]
 toplevel = many $ do
-    def <- klass <|> include <|> includecore <|> reset
+    def <- klass <|> include <|> includecore <|> reset <|> idle
     return def
 
 klass :: Parser Expr

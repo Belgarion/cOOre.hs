@@ -15,14 +15,14 @@ referera "websocket/std.coore"
 
 struktur server
 	endTime = 1000
-	sendBuff = ""
+	sendBuff = ext§malloc(12)
 	sendTime = 1000
 	currentTime = 0
 
 	°need begär send
 	hel compileJson()
 		temp1 = ext§cat("{" sendBuff)
-		temp2 = ext§cat(sendBuff "}")
+		temp2 = ext§cat(temp1 "}")
 		sendBuff = temp2
 		ext§free(temp1)
 		återvänd 1
@@ -51,7 +51,7 @@ struktur server
 		ext§free(temp2)
 		ext§free(temp3)
 		temp = ext§cat(sendBuff temp4)
-		ext§free(sendBuff)
+		°ext§free(sendBuff)
 		sendBuff = temp
 		ext§free(temp4)
 		återvänd 1
@@ -65,10 +65,9 @@ struktur server
 			compileJson()
 			sync ext§ws_send(sendBuff)
 			currentTime = sendTime + currentTime
-
-			ext§free(sendBuff)
+            ext§memset(sendBuff 0 ext§strlen(sendBuff))
 		klar
-		async efter 4 sendData()
+		async efter 400 sendData()
 	klar
 
 
@@ -112,9 +111,14 @@ meep
 °}
 
 
-
-
 reset
+    ° workaround a small problem in the codegen
+    ° will cause type checker warnings
+    ext§init_server()
+    ext§init_client()
+klar
+
+idle
 	async efter 500 server§sendData()
     sync ext§idle_websocket()
 klar
