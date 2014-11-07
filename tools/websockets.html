@@ -36,6 +36,7 @@
         // Display messages received from the server
         socket.addEventListener("message", function(event) {
           message.textContent = "Server Says: " + event.data;
+		  console.log("Server says: " + event.data);
         });
 
         // Display any errors that occur

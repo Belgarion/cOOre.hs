@@ -4,44 +4,44 @@ const char* CORE_FILE_INFO = "Compiled with : RTFM-core options:\ninfile       :
 enum resources {sendLock,RES_NR};
 int ceilings[] = {2};
 const char* res_names[] = {"sendLock"};
-enum entry_nr {user_reset_nr, user_idle_nr, reset_server_sendData_0_nr, reset_server_sendData_0_server_sendData_0_nr, reset_idle_websocket_0_client_receive_0_nr, ENTRY_NR};
+enum entry_nr {user_reset_nr, user_idle_nr, idle_server_sendData_0_nr, idle_server_sendData_0_server_sendData_0_nr, idle_idle_websocket_0_client_receive_0_nr, ENTRY_NR};
 int entry_prio[] = {0, 0, 2, 2, 1};
-char* entry_names[] = {"user_reset", "user_idle", "reset_server_sendData_0", "reset_server_sendData_0_server_sendData_0", "reset_idle_websocket_0_client_receive_0"};
+char* entry_names[] = {"user_reset", "user_idle", "idle_server_sendData_0", "idle_server_sendData_0_server_sendData_0", "idle_idle_websocket_0_client_receive_0"};
 
-// Task instance definition: @prio 2 reset_server_sendData_0
-void reset_server_sendData_0(int RTFM_id); // function prototype for the instance task
-void entry_reset_server_sendData_0(int RTFM_id); // function prototype for the instance task
+// Task instance definition: @prio 2 idle_server_sendData_0
+void idle_server_sendData_0(int RTFM_id); // function prototype for the instance task
+void entry_idle_server_sendData_0(int RTFM_id); // function prototype for the instance task
 
-// Task instance definition: @prio 2 reset_server_sendData_0_server_sendData_0
-void reset_server_sendData_0_server_sendData_0(int RTFM_id); // function prototype for the instance task
-void entry_reset_server_sendData_0_server_sendData_0(int RTFM_id); // function prototype for the instance task
+// Task instance definition: @prio 2 idle_server_sendData_0_server_sendData_0
+void idle_server_sendData_0_server_sendData_0(int RTFM_id); // function prototype for the instance task
+void entry_idle_server_sendData_0_server_sendData_0(int RTFM_id); // function prototype for the instance task
 
-// Task instance definition: @prio 1 reset_idle_websocket_0_client_receive_0
-void reset_idle_websocket_0_client_receive_0(int RTFM_id, char* msg); // function prototype for the instance task
-void entry_reset_idle_websocket_0_client_receive_0(int RTFM_id); // function prototype for the instance task
+// Task instance definition: @prio 1 idle_idle_websocket_0_client_receive_0
+void idle_idle_websocket_0_client_receive_0(int RTFM_id, char* msg); // function prototype for the instance task
+void entry_idle_idle_websocket_0_client_receive_0(int RTFM_id); // function prototype for the instance task
 
-ENTRY_FUNC entry_func[] = {user_reset, user_idle, entry_reset_server_sendData_0, entry_reset_server_sendData_0_server_sendData_0, entry_reset_idle_websocket_0_client_receive_0};
+ENTRY_FUNC entry_func[] = {user_reset, user_idle, entry_idle_server_sendData_0, entry_idle_server_sendData_0_server_sendData_0, entry_idle_idle_websocket_0_client_receive_0};
 
-typedef struct {;} ARG_reset_server_sendData_0; // type definition for arguments
-ARG_reset_server_sendData_0 arg_reset_server_sendData_0; // instance for argument
-void entry_reset_server_sendData_0(int RTFM_id) {
-	reset_server_sendData_0(RTFM_id); // (inlined) call to the async function
+typedef struct {;} ARG_idle_server_sendData_0; // type definition for arguments
+ARG_idle_server_sendData_0 arg_idle_server_sendData_0; // instance for argument
+void entry_idle_server_sendData_0(int RTFM_id) {
+	idle_server_sendData_0(RTFM_id); // (inlined) call to the async function
 }
-int reset_server_sendData_0_sendLock_server_addJson_0(int RTFM_id, char* key, char* value); // function prototype
-int reset_server_sendData_0_sendLock_server_compileJson_0(int RTFM_id); // function prototype
-void reset_server_sendData_0_sendLock_ws_send_0(int RTFM_id, char* message); // function prototype
-typedef struct {;} ARG_reset_server_sendData_0_server_sendData_0; // type definition for arguments
-ARG_reset_server_sendData_0_server_sendData_0 arg_reset_server_sendData_0_server_sendData_0; // instance for argument
-void entry_reset_server_sendData_0_server_sendData_0(int RTFM_id) {
-	reset_server_sendData_0_server_sendData_0(RTFM_id); // (inlined) call to the async function
+int idle_server_sendData_0_sendLock_server_addJson_0(int RTFM_id, char* key, char* value); // function prototype
+int idle_server_sendData_0_sendLock_server_compileJson_0(int RTFM_id); // function prototype
+void idle_server_sendData_0_sendLock_ws_send_0(int RTFM_id, char* message); // function prototype
+typedef struct {;} ARG_idle_server_sendData_0_server_sendData_0; // type definition for arguments
+ARG_idle_server_sendData_0_server_sendData_0 arg_idle_server_sendData_0_server_sendData_0; // instance for argument
+void entry_idle_server_sendData_0_server_sendData_0(int RTFM_id) {
+	idle_server_sendData_0_server_sendData_0(RTFM_id); // (inlined) call to the async function
 }
-void reset_idle_websocket_0(int RTFM_id); // function prototype
-typedef struct {char* msg;} ARG_reset_idle_websocket_0_client_receive_0; // type definition for arguments
-ARG_reset_idle_websocket_0_client_receive_0 arg_reset_idle_websocket_0_client_receive_0; // instance for argument
-void entry_reset_idle_websocket_0_client_receive_0(int RTFM_id) {
-	reset_idle_websocket_0_client_receive_0(RTFM_id, arg_reset_idle_websocket_0_client_receive_0.msg); // (inlined) call to the async function
+void idle_idle_websocket_0(int RTFM_id); // function prototype
+typedef struct {char* msg;} ARG_idle_idle_websocket_0_client_receive_0; // type definition for arguments
+ARG_idle_idle_websocket_0_client_receive_0 arg_idle_idle_websocket_0_client_receive_0; // instance for argument
+void entry_idle_idle_websocket_0_client_receive_0(int RTFM_id) {
+	idle_idle_websocket_0_client_receive_0(RTFM_id, arg_idle_idle_websocket_0_client_receive_0.msg); // (inlined) call to the async function
 }
-int reset_idle_websocket_0_client_receive_0_server_reset1_0(int RTFM_id); // function prototype
+int idle_idle_websocket_0_client_receive_0_server_reset1_0(int RTFM_id); // function prototype
 
 
 #include <sys/socket.h>
@@ -157,7 +157,7 @@ int currentTime;
 struct struct_server server;
 void init_server() {
 server.endTime = 1000;
-server.sendBuff = "";
+server.sendBuff = malloc(12);
 server.sendTime = 1000;
 server.currentTime = 0;
 }
@@ -169,25 +169,29 @@ void init_client() {
 }
 
 void user_reset(int RTFM_id) {
-arg_reset_server_sendData_0 = (ARG_reset_server_sendData_0){}; 
-RTFM_pend(0, 500000, RTFM_id, reset_server_sendData_0_nr);
-reset_idle_websocket_0(RTFM_id);
+init_server();
+init_client();
 }
-void reset_server_sendData_0(int RTFM_id){ // function implementation for the task:reset_server_sendData_0[reset_server_sendData_0]
+void user_idle(int RTFM_id) {
+arg_idle_server_sendData_0 = (ARG_idle_server_sendData_0){}; 
+RTFM_pend(500000, 4611686018426887903, RTFM_id, idle_server_sendData_0_nr);
+idle_idle_websocket_0(RTFM_id);
+}
+void idle_server_sendData_0(int RTFM_id){ // function implementation for the task:idle_server_sendData_0[idle_server_sendData_0]
 RTFM_lock(RTFM_id, sendLock);
 char* timeString;
 timeString = malloc(8* ilen(server.currentTime / 1000));
 itoa(server.currentTime / 1000, timeString );
-reset_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
-reset_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
-reset_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
+idle_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
+idle_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
+idle_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
 server.currentTime = server.sendTime + server.currentTime ;
-free(server.sendBuff );
+memset(server.sendBuff , 0, strlen(server.sendBuff ));
 RTFM_unlock(RTFM_id, sendLock);
-arg_reset_server_sendData_0_server_sendData_0 = (ARG_reset_server_sendData_0_server_sendData_0){}; 
-RTFM_pend(0, 4000, RTFM_id, reset_server_sendData_0_server_sendData_0_nr);
+arg_idle_server_sendData_0_server_sendData_0 = (ARG_idle_server_sendData_0_server_sendData_0){}; 
+RTFM_pend(400000, 4611686018426487903, RTFM_id, idle_server_sendData_0_server_sendData_0_nr);
 }
-int reset_server_sendData_0_sendLock_server_addJson_0(int RTFM_id, char* key, char* value){
+int idle_server_sendData_0_sendLock_server_addJson_0(int RTFM_id, char* key, char* value){
 char* temp1;
 char* temp2;
 char* temp3;
@@ -211,21 +215,20 @@ free(temp1 );
 free(temp2 );
 free(temp3 );
 temp = cat(server.sendBuff , temp4 );
-free(server.sendBuff );
 server.sendBuff = temp ;
 free(temp4 );
 return 1;
 }
-int reset_server_sendData_0_sendLock_server_compileJson_0(int RTFM_id){
+int idle_server_sendData_0_sendLock_server_compileJson_0(int RTFM_id){
 char* temp1;
 char* temp2;
 temp1 = cat("{", server.sendBuff );
-temp2 = cat(server.sendBuff , "}");
+temp2 = cat(temp1 , "}");
 server.sendBuff = temp2 ;
 free(temp1 );
 return 1;
 }
-void reset_server_sendData_0_sendLock_ws_send_0(int RTFM_id, char* message){
+void idle_server_sendData_0_sendLock_ws_send_0(int RTFM_id, char* message){
 if (connfd == 0)
     return;
 
@@ -239,21 +242,21 @@ if (connfd == 0)
   sendBuff[1] = 0x00 | len; // no mask
   send(connfd, sendBuff, len + 2, 0);
 }
-void reset_server_sendData_0_server_sendData_0(int RTFM_id){ // function implementation for the task:reset_server_sendData_0_server_sendData_0[reset_server_sendData_0]
+void idle_server_sendData_0_server_sendData_0(int RTFM_id){ // function implementation for the task:idle_server_sendData_0_server_sendData_0[idle_server_sendData_0]
 RTFM_lock(RTFM_id, sendLock);
 char* timeString;
 timeString = malloc(8* ilen(server.currentTime / 1000));
 itoa(server.currentTime / 1000, timeString );
-reset_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
-reset_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
-reset_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
+idle_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
+idle_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
+idle_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
 server.currentTime = server.sendTime + server.currentTime ;
-free(server.sendBuff );
+memset(server.sendBuff , 0, strlen(server.sendBuff ));
 RTFM_unlock(RTFM_id, sendLock);
-arg_reset_server_sendData_0_server_sendData_0 = (ARG_reset_server_sendData_0_server_sendData_0){}; 
-RTFM_pend(0, 4000, RTFM_id, reset_server_sendData_0_server_sendData_0_nr);
+arg_idle_server_sendData_0_server_sendData_0 = (ARG_idle_server_sendData_0_server_sendData_0){}; 
+RTFM_pend(400000, 4611686018426487903, RTFM_id, idle_server_sendData_0_server_sendData_0_nr);
 }
-void reset_idle_websocket_0(int RTFM_id){
+void idle_idle_websocket_0(int RTFM_id){
 int listenfd = 0;
   struct sockaddr_in serv_addr;
 
@@ -357,8 +360,8 @@ int listenfd = 0;
 
         decoded[msg_size] = 0; // terminate the string
         DPS("Text msg %s", decoded);
-arg_reset_idle_websocket_0_client_receive_0 = (ARG_reset_idle_websocket_0_client_receive_0){(char*)decoded}; 
-RTFM_pend(0, 4611686018427387903, RTFM_id, reset_idle_websocket_0_client_receive_0_nr);
+arg_idle_idle_websocket_0_client_receive_0 = (ARG_idle_idle_websocket_0_client_receive_0){(char*)decoded}; 
+RTFM_pend(0, 4611686018427387903, RTFM_id, idle_idle_websocket_0_client_receive_0_nr);
 }
       DPS("trying to reconnect");
       close(connfd);
@@ -367,18 +370,16 @@ RTFM_pend(0, 4611686018427387903, RTFM_id, reset_idle_websocket_0_client_receive
   // never happens	
   close(listenfd);
 }
-void reset_idle_websocket_0_client_receive_0(int RTFM_id, char* msg){ // function implementation for the task:reset_idle_websocket_0_client_receive_0[reset_idle_websocket_0_client_receive_0]
+void idle_idle_websocket_0_client_receive_0(int RTFM_id, char* msg){ // function implementation for the task:idle_idle_websocket_0_client_receive_0[idle_idle_websocket_0_client_receive_0]
 if (isEqual(strcmp(msg , "vinner"), 0)) {
-reset_idle_websocket_0_client_receive_0_server_reset1_0(RTFM_id);
+idle_idle_websocket_0_client_receive_0_server_reset1_0(RTFM_id);
 } else {
 }
 }
-int reset_idle_websocket_0_client_receive_0_server_reset1_0(int RTFM_id){
+int idle_idle_websocket_0_client_receive_0_server_reset1_0(int RTFM_id){
 server.endTime = 1000;
 free(server.sendBuff );
 server.sendTime = 1000;
 server.currentTime = 0;
-}
-void user_idle(int RTFM_id) {
 }
 

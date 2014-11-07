@@ -248,7 +248,7 @@ int currentTime;
 struct struct_server server;
 void init_server() {<#
 #>server.endTime = 1000;<#
-#>server.sendBuff = "";<#
+#>server.sendBuff = malloc(12);<#
 #>server.sendTime = 1000;<#
 #>server.currentTime = 0;<#
 #>}
@@ -256,7 +256,7 @@ void init_server() {<#
 #>char* temp1;
 char* temp2;
 <#  #>temp1 = cat("{", server.sendBuff );<#
-  #>temp2 = cat(server.sendBuff , "}");<#
+  #>temp2 = cat(temp1 , "}");<#
   #>server.sendBuff = temp2 ;<#
   #>free(temp1 );<#
   #>return 1;<#
@@ -288,7 +288,6 @@ char* temp;
   #>free(temp2 );<#
   #>free(temp3 );<#
   #>temp = cat(server.sendBuff , temp4 );<#
-  #>free(server.sendBuff );<#
   #>server.sendBuff = temp ;<#
   #>free(temp4 );<#
   #>return 1;<#
@@ -303,9 +302,9 @@ Task server_sendData() {
   sync server_compileJson();
   sync ws_send(server.sendBuff )  ;
   #>server.currentTime = server.sendTime + server.currentTime ;<#
-  #>free(server.sendBuff );<#
+  #>memset(server.sendBuff , 0, strlen(server.sendBuff ));<#
   }
-  async  before 4 ms server_sendData()  ;
+  async  after 400 ms server_sendData()  ;
 
 }
 Func int server_addJsonLocked(char* key, char* value) {
@@ -343,7 +342,12 @@ void init_client() {<#
 }
 
 Reset {
-#><#  async  before 500 ms server_sendData()  ;
+#><#  #>init_server();<#
+  #>init_client();<#
+
+}
+Idle {
+#><#  async  after 500 ms server_sendData()  ;
   sync idle_websocket()  ;
 
 }
