@@ -297,14 +297,14 @@ Task server_sendData() {
 #><#  claim sendLock {
 #>char* timeString;
 <#  #>timeString = malloc(8* ilen(server.currentTime / 1000));<#
-  #>itoa(server.currentTime / 1000, timeString );<#
+  #>itoa(server.endTime - server.currentTime / 1000, timeString );<#
   sync server_addJson("time", timeString );
   sync server_compileJson();
   sync ws_send(server.sendBuff )  ;
   #>server.currentTime = server.sendTime + server.currentTime ;<#
   #>memset(server.sendBuff , 0, strlen(server.sendBuff ));<#
   }
-  async  after 400 ms server_sendData()  ;
+  async  after 1000 ms server_sendData()  ;
 
 }
 Func int server_addJsonLocked(char* key, char* value) {

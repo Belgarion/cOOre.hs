@@ -181,7 +181,7 @@ void idle_server_sendData_0(int RTFM_id){ // function implementation for the tas
 RTFM_lock(RTFM_id, sendLock);
 char* timeString;
 timeString = malloc(8* ilen(server.currentTime / 1000));
-itoa(server.currentTime / 1000, timeString );
+itoa(server.endTime - server.currentTime / 1000, timeString );
 idle_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
 idle_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
 idle_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
@@ -189,7 +189,7 @@ server.currentTime = server.sendTime + server.currentTime ;
 memset(server.sendBuff , 0, strlen(server.sendBuff ));
 RTFM_unlock(RTFM_id, sendLock);
 arg_idle_server_sendData_0_server_sendData_0 = (ARG_idle_server_sendData_0_server_sendData_0){}; 
-RTFM_pend(400000, 4611686018426487903, RTFM_id, idle_server_sendData_0_server_sendData_0_nr);
+RTFM_pend(1000000, 4611686018425887903, RTFM_id, idle_server_sendData_0_server_sendData_0_nr);
 }
 int idle_server_sendData_0_sendLock_server_addJson_0(int RTFM_id, char* key, char* value){
 char* temp1;
@@ -246,7 +246,7 @@ void idle_server_sendData_0_server_sendData_0(int RTFM_id){ // function implemen
 RTFM_lock(RTFM_id, sendLock);
 char* timeString;
 timeString = malloc(8* ilen(server.currentTime / 1000));
-itoa(server.currentTime / 1000, timeString );
+itoa(server.endTime - server.currentTime / 1000, timeString );
 idle_server_sendData_0_sendLock_server_addJson_0(RTFM_id, "time", timeString);
 idle_server_sendData_0_sendLock_server_compileJson_0(RTFM_id);
 idle_server_sendData_0_sendLock_ws_send_0(RTFM_id, server.sendBuff);
@@ -254,7 +254,7 @@ server.currentTime = server.sendTime + server.currentTime ;
 memset(server.sendBuff , 0, strlen(server.sendBuff ));
 RTFM_unlock(RTFM_id, sendLock);
 arg_idle_server_sendData_0_server_sendData_0 = (ARG_idle_server_sendData_0_server_sendData_0){}; 
-RTFM_pend(400000, 4611686018426487903, RTFM_id, idle_server_sendData_0_server_sendData_0_nr);
+RTFM_pend(1000000, 4611686018425887903, RTFM_id, idle_server_sendData_0_server_sendData_0_nr);
 }
 void idle_idle_websocket_0(int RTFM_id){
 int listenfd = 0;
