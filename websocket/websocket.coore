@@ -111,13 +111,6 @@ meep
 °}
 
 
-reset
-    ° workaround a small problem in the codegen
-    ° will cause type checker warnings
-    ext§init_server()
-    ext§init_client()
-klar
-
 idle
 	async efter 500 server§sendData()
     sync ext§idle_websocket()

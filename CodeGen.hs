@@ -167,3 +167,27 @@ fancyCodeGen funcenv ((env, (SyncF stmt)):ast) klass depth =
     (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv (expr:ast) klass depth =
     (ind depth) ++ "other :: " ++ (show expr) ++ "\n" ++ (fancyCodeGen funcenv ast klass (depth+1))
+
+isClass :: (VariablesMap, FancyExpr) -> Bool
+isClass (_, (KlassF _ _)) = True
+isClass _ = False
+
+createInit :: [(VariablesMap, FancyExpr)] -> FancyAST
+createInit ((_, (KlassF name _)):ast) = (Data.Map.empty, (CallF "ext" ("init_" ++ name) [])):(createInit ast)
+createInit [] = []
+
+fixReset :: FancyAST -> [(VariablesMap, FancyExpr)] -> FancyAST
+fixReset ((env, (FunctionF "reset" "Reset" [] body)):ast) strukturer =
+    -- add init to existing reset
+    (env, (FunctionF "reset" "Reset" [] ((createInit strukturer) ++ body))):ast
+fixReset (expr:ast) strukturer = expr:(fixReset ast strukturer)
+fixReset [] strukturer =
+    -- add new reset with init functions if reset was not defined
+    [(Data.Map.empty, (FunctionF "reset" "Reset" [] (createInit strukturer)))]
+
+codeGen :: FunctionsMap -> FancyAST -> String
+codeGen funcenv ast =
+    fancyCodeGen funcenv nast "" 0
+    where
+        strukturer = [x | x <- ast, isClass x]
+        nast = fixReset ast strukturer

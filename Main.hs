@@ -53,7 +53,7 @@ main = do
                 putStrLn $ printAst ex 0
                 let (fast, funcenv, varenv, log) = doTypecheck ex
                 putStrLn $ join "\n" log
-                let corecode = fancyCodeGen funcenv fast "" 0
+                let corecode = codeGen funcenv fast
                 writeFile "out.core" corecode
                 --putStrLn $ show fast
         return ()

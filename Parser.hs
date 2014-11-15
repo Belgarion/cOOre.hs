@@ -108,13 +108,6 @@ reservedReturn x = do
   reserved x
   return x
 
-extern :: Parser Expr
-extern = do
-  reserved "extern"
-  name <- identifier
-  args <- parens $ many variable
-  return $ Extern name args
-
 call :: Parser Expr
 call = try callInside <|> callOutside
 
@@ -135,7 +128,6 @@ callOutside = do
 
 factor :: Parser Expr
 factor = types
-      <|> try extern
       <|> try function
       <|> try call
       <|> try async
@@ -203,8 +195,7 @@ sync = do
     return $ Sync body
 
 defn :: Parser Expr
-defn = try extern
-    <|> try function
+defn = try function
     <|> expr
 
 contents :: Parser a -> Parser a
