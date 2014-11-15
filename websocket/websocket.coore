@@ -60,14 +60,14 @@ struktur server
 	def sendData()
 		begär sendLock
 			timeString = ext§malloc(8*ext§ilen(currentTime/1000))
-			ext§itoa(currentTime/1000 timeString)
+			ext§itoa(endTime-(currentTime/1000) timeString)
 			addJson("time" timeString)
 			compileJson()
 			sync ext§ws_send(sendBuff)
 			currentTime = sendTime + currentTime
             ext§memset(sendBuff 0 ext§strlen(sendBuff))
 		klar
-		async efter 400 sendData()
+		async efter 1000 sendData()
 	klar
 
 

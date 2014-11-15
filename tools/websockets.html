@@ -4,6 +4,13 @@
   <title>WebSocket Echo Client</title>
   <meta charset="UTF-8" />
   <script>
+
+    function pad(n, width, z) {
+      z = z || '0';
+      n = n + '';
+      return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+    
     "use strict";
     // Initialize everything when the window finishes loading
     window.addEventListener("load", function(event) {
@@ -36,6 +43,15 @@
         // Display messages received from the server
         socket.addEventListener("message", function(event) {
           message.textContent = "Server Says: " + event.data;
+		      var data = eval('(' + event.data + ')');
+          console.log(data);
+          console.log(data.time);
+          var time = parseInt(data.time);
+          var min  = pad(Math.floor(time/60),3);
+          var sec =  pad(time%60,2);
+          document.getElementById("min").textContent = min;
+          document.getElementById("sec").textContent = sec;
+          console.log("Server says: " + event.data);
         });
 
         // Display any errors that occur
@@ -74,5 +90,7 @@
   <input id="send" type="button" value="Send" />&nbsp;
   <input id="text" /><br />
   <span id="message"></span>
+  <span id="min"></span>
+  <span id="sec"></span>
 </body>
 </html>
