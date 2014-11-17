@@ -130,6 +130,9 @@ fancyCodeGen funcenv ((env,(ForF init cond after fstmts)):ast) klass depth =
 fancyCodeGen funcenv ((env, (ReturnF value)):ast) klass depth =
     (ind depth) ++ "#>return " ++ (fancyCodeGen funcenv [value] klass 0) ++ ";<#\n" ++
     (fancyCodeGen funcenv ast klass depth)
+fancyCodeGen funcenv ((env, (ClaimReturnF value)):ast) klass depth =
+    (ind depth) ++ "clam_return #>" ++ (fancyCodeGen funcenv [value] klass 0) ++ "<#;\n" ++
+    (fancyCodeGen funcenv ast klass depth)
 fancyCodeGen funcenv ((env, (CallF cklass name params)):ast) klass depth =
     (ind depth) ++ (isitC "#>") ++ maybeSync ++ (if cklass == "ext" then "" else (cklass ++ "_")) ++ name ++ "(" ++
     (join ", " [fancyCodeGen funcenv [x] klass 0 | x <- params]) ++ ")" ++
@@ -185,9 +188,20 @@ fixReset [] strukturer =
     -- add new reset with init functions if reset was not defined
     [(Data.Map.empty, (FunctionF "reset" "Reset" [] (createInit strukturer)))]
 
+fixClaimReturn :: FancyAST -> Bool -> FancyAST
+fixClaimReturn ((env, (ClaimF name cast)):ast) inClaim = ((env, (ClaimF name (fixClaimReturn cast True)))):(fixClaimReturn ast inClaim)
+fixClaimReturn ((env, (ReturnF expr)):ast) True = (env, (ClaimReturnF expr)):(fixClaimReturn ast True)
+fixClaimReturn ((env, (KlassF name kast)):ast) inClaim = (env, (KlassF name (fixClaimReturn kast inClaim))):(fixClaimReturn ast inClaim)
+fixClaimReturn ((env, (FunctionF typ name params fast)):ast) inClaim = (env, (FunctionF typ name params (fixClaimReturn fast inClaim))):(fixClaimReturn ast inClaim)
+fixClaimReturn ((env, (ForF init cond after fast)):ast) inClaim = (env, (ForF init cond after (fixClaimReturn fast inClaim))):(fixClaimReturn ast inClaim)
+fixClaimReturn ((env, (IfF cond tast east)):ast) inClaim = (env, (IfF cond (fixClaimReturn tast inClaim) (fixClaimReturn east inClaim))):(fixClaimReturn ast inClaim)
+fixClaimReturn (expr:ast) inClaim = Debug.Trace.trace ("other " ++ (show expr)) expr:(fixClaimReturn ast inClaim)
+fixClaimReturn [] _ = []
+
 codeGen :: FunctionsMap -> FancyAST -> String
 codeGen funcenv ast =
-    fancyCodeGen funcenv nast "" 0
+    fancyCodeGen funcenv cast "" 0
     where
         strukturer = [x | x <- ast, isClass x]
         nast = fixReset ast strukturer
+        cast = fixClaimReturn nast False

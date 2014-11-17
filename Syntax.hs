@@ -42,6 +42,7 @@ data FancyExpr -- for FancyAst
   | CallF Name Name FancyAST
   | FunctionF Type Name [Expr] FancyAST
   | ReturnF FancyASTEntry
+  | ClaimReturnF FancyASTEntry
   | ClaimF Name FancyAST
   | ExternF Name FancyAST
   | BinaryDefF Name [Name] FancyExpr

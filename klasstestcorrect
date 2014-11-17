@@ -28,6 +28,11 @@ struktur foo
          (10+10)*10
         klar
         för iass=0 ext§greaterThan(iass 4) iass=iass+1
+            om iass=3
+                begär hej
+                    återvänd 3
+                klar
+            klar
             bar(iass "hej")
             ext§greaterThan(iass 4)
         klar
