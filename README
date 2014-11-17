@@ -2,3 +2,17 @@ cOOre compiler in haskell
 inspiration taken from: 
 http://www.stephendiehl.com/llvm/
 https://github.com/sdiehl/kaleidoscope/
+
+Compile:
+ghc Main.hs && ./Main websocket/websocket.core
+cp out.core tools
+cd tools
+./comp.sh
+sudo ./PTCORE
+
+Test files:
+websocket/websocket.coore
+klasstestcorrect
+klasstest
+test2
+test3

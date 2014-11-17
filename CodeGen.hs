@@ -195,7 +195,7 @@ fixClaimReturn ((env, (KlassF name kast)):ast) inClaim = (env, (KlassF name (fix
 fixClaimReturn ((env, (FunctionF typ name params fast)):ast) inClaim = (env, (FunctionF typ name params (fixClaimReturn fast inClaim))):(fixClaimReturn ast inClaim)
 fixClaimReturn ((env, (ForF init cond after fast)):ast) inClaim = (env, (ForF init cond after (fixClaimReturn fast inClaim))):(fixClaimReturn ast inClaim)
 fixClaimReturn ((env, (IfF cond tast east)):ast) inClaim = (env, (IfF cond (fixClaimReturn tast inClaim) (fixClaimReturn east inClaim))):(fixClaimReturn ast inClaim)
-fixClaimReturn (expr:ast) inClaim = Debug.Trace.trace ("other " ++ (show expr)) expr:(fixClaimReturn ast inClaim)
+fixClaimReturn (expr:ast) inClaim = expr:(fixClaimReturn ast inClaim)
 fixClaimReturn [] _ = []
 
 codeGen :: FunctionsMap -> FancyAST -> String
